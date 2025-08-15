@@ -16,9 +16,8 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything v
 
 ## Prerequisites
 
-### macOS
-Install [Homebrew](https://brew.sh/) if you don’t already have it:
+## Prerequisites
 
-```sh
-command -v brew >/dev/null 2>&1 || \
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+Just run `./bootstrap.sh` — it will install GNU Stow and Oh My Zsh if they’re missing.  
+On macOS, you need [Homebrew](https://brew.sh/) installed first.  
+On Linux, make sure you have `git` and a package manager that can install `stow`.
