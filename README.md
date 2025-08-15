@@ -7,7 +7,7 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything v
 
 ## Features
 
-- Keep configs in `~/.dotfiles` but `./bootstrap.sh` symlinks them back into `$HOME`
+- Keep configs in `~/.dotfiles`, `./bootstrap.sh` symlinks them back into `$HOME`
 - Clean separation: `zsh/`, `nvim/`, `git/`
 - Ignores runtime files like history and caches
 - Portable: works on macOS and Linux
