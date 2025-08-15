@@ -1,0 +1,15 @@
+# neovim > vim
+alias vim="nvim"
+
+# Update trunk/master with upstream fork
+alias update="git checkout master && git fetch --tags -f upstream &&
+git rebase upstream/master && git push origin HEAD:master"
+alias updatet="git checkout trunk && git fetch --tags -f upstream &&
+git rebase upstream/trunk && git push origin HEAD:trunk"
+
+# kafka aliases
+alias ksuuid="bin/kafka-storage.sh random-uuid 2> /dev/null"
+alias ksformat="bin/kafka-storage.sh format"
+alias kbstart="bin/kafka-server-start.sh config/kraft/broker.properties"
+alias kcstart="bin/kafka-server-start.sh config/kraft/controller.properties"
+alias kconfig="bin/kafka-configs.sh --bootstrap-server localhost:9092"
