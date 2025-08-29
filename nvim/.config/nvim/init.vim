@@ -1,9 +1,9 @@
+let g:editorconfig = v:false
 set number
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab
-
 
 " Specify a directory for plugins
 " - For Neovim: stdpath('data') . '/plugged'
@@ -127,7 +127,7 @@ nmap <silent> oi :CocCommand java.action.organizeImports <CR>
 " open quickfix window automatically when AsyncRun is executed
 " set the quickfix window 6 lines height.
 let g:asyncrun_open = 10
-nmap <silent> ar :AsyncRun 
+nmap <silent> ar :AsyncRun
 
 " Buffer Navigation
 nmap <silent> bn :bn <CR>
