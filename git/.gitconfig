@@ -3,3 +3,6 @@
 # Please adapt and uncomment the following lines:
 	name = Ryan Dielhenn
 	email = dielhennr@gmail.com
+[credential "https://github.com"]
+    helper =
+    helper = !gh auth git-credential
