@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 # Cross-platform bootstrap (Pop!_OS/Ubuntu/Debian + macOS)
 # - Installs: git, curl, stow, fzf, ripgrep, unzip, build tools
-# - Editors: Neovim + Vim (vim-gtk3), vim-plug, headless PlugInstall
+# - Editors: Neovim + full Vim (vim-gtk3), vim-plug, headless PlugInstall
 # - Shell: zsh default (idempotent), optional Oh My Zsh
 # - Node: optional nvm + LTS
 # - Dotfiles: GNU stow of selected packages
+#
+# Usage:
+#   DRY_RUN=1 ./bootstrap.sh               # preview actions
+#   INSTALL_OMZ=0 ./bootstrap.sh           # skip Oh My Zsh
+#   NODE_MAJOR=20 ./bootstrap.sh           # choose Node LTS major
 #
 # Safe to re-run. Exits on error.
 set -euo pipefail
@@ -31,6 +36,7 @@ doit() {
 }
 
 ensure_line() {
+  # ensure_line "text" "file"
   local text="$1"; local file="$2"
   [ -f "$file" ] || touch "$file"
   grep -qxF "$text" "$file" || printf "%s\n" "$text" >> "$file"
@@ -71,7 +77,8 @@ install_base_macos() {
   log "Installing base packages (macOS)"
   if ! exists brew; then
     log "Installing Homebrew"
-    doit '/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"'
+    doit '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+    # Add brew to PATH for Apple Silicon/Intel
     if [ -d /opt/homebrew/bin ]; then
       eval "$(/opt/homebrew/bin/brew shellenv)"
       ensure_line 'eval "$(/opt/homebrew/bin/brew shellenv)"' "$HOME/.zprofile"
@@ -86,7 +93,7 @@ install_base_macos() {
 
 # --------------- Editors ---------------
 install_editors_debian() {
-  log "Installing Neovim and Vim (vim-gtk3)"
+  log "Installing Neovim and full Vim (vim-gtk3)"
   doit "sudo apt install -y --no-install-recommends neovim vim-gtk3"
 }
 
@@ -110,20 +117,21 @@ setup_zsh_default_shell_debian() {
     doit "chsh -s '$zsh_bin' '$USER' || sudo chsh -s '$zsh_bin' '$USER' || sudo usermod -s '$zsh_bin' '$USER'"
   fi
 
-  # IMPORTANT: do NOT create ~/.zshrc here if the repo provides zsh/.zshrc.
-  if [ -d "$REPO_DIR/zsh" ] && [ -e "$REPO_DIR/zsh/.zshrc" ]; then
-    log "Repo provides zsh/.zshrc; will rely on stow to place it."
-  else
-    if [ ! -f "$HOME/.zshrc" ]; then
-      cat > "$HOME/.zshrc" <<'ZRC'
+  # Minimal ~/.zshrc if missing
+  if [ ! -f "$HOME/.zshrc" ]; then
+    cat > "$HOME/.zshrc" <<'ZRC'
 export EDITOR="nvim"
 alias vim='nvim'
 ZRC
-    fi
+  else
+    ensure_line "export EDITOR=\"nvim\"" "$HOME/.zshrc"
+    ensure_line "alias vim='nvim'" "$HOME/.zshrc"
   fi
 
-  log "zsh set as login shell (will apply on next login)."
-  log "Tip: log out/reboot, or run 'exec zsh -l' to start zsh in this terminal."
+  # Make current session switch to zsh (skip in CI or non-tty)
+  if [ -z "${CI:-}" ] && [ -z "${ZSH_VERSION:-}" ] && [ -t 1 ] && [ "${DRY_RUN}" != "1" ]; then
+    exec "$zsh_bin" -l
+  fi
 }
 
 setup_zsh_default_shell_macos() {
@@ -136,38 +144,17 @@ setup_zsh_default_shell_macos() {
   if ! grep -qx "$zsh_bin" /etc/shells; then
     doit "echo '$zsh_bin' | sudo tee -a /etc/shells >/dev/null"
   fi
+  # macOS: chsh works for user; login session change requires new terminal
   doit "chsh -s '$zsh_bin' '$USER' || true"
 
-  if [ -d "$REPO_DIR/zsh" ] && [ -e "$REPO_DIR/zsh/.zshrc" ]; then
-    log "Repo provides zsh/.zshrc; will rely on stow to place it."
-  else
-    if [ ! -f "$HOME/.zshrc" ]; then
-      cat > "$HOME/.zshrc" <<'ZRC'
+  if [ ! -f "$HOME/.zshrc" ]; then
+    cat > "$HOME/.zshrc" <<'ZRC'
 export EDITOR="nvim"
 alias vim='nvim'
 ZRC
-    fi
-  fi
-
-  log "zsh set as login shell. Open a new terminal session."
-}
-
-# --------------- GNU stow dotfiles ---------------
-run_stow() {
-  local pkgs=("$@")
-  if [ "${#pkgs[@]}" -eq 0 ]; then
-    pkgs=("${STOW_PKGS_DEFAULT[@]}")
-  fi
-  local repo="${REPO_DIR:-$PWD}"
-  log "Stowing packages: ${pkgs[*]}"
-
-  # Try a normal apply; if conflicts (existing real files), adopt them.
-  if ! stow -v -R -d "$repo" -t "$HOME" "${pkgs[@]}"; then
-    log "Stow encountered conflicts; adopting existing files into the repo..."
-    stow --adopt -v -R -d "$repo" -t "$HOME" "${pkgs[@]}"
-    if command -v git >/dev/null 2>&1; then
-      git -C "$repo" add -A || true
-    fi
+  else
+    ensure_line "export EDITOR=\"nvim\"" "$HOME/.zshrc"
+    ensure_line "alias vim='nvim'" "$HOME/.zshrc"
   fi
 }
 
@@ -177,7 +164,7 @@ install_ohmyzsh() {
     log "Installing Oh My Zsh (non-interactive)"
     doit "RUNZSH=no CHSH=no sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
   else
-    log "Skipping Oh My Zsh (already installed or INSTALL_OMZ=0)"
+    log "Skipping Oh My Zsh (already present or INSTALL_OMZ=0)"
   fi
 }
 
@@ -188,9 +175,11 @@ setup_vimplug_nvim() {
   if [ ! -f "$auto" ]; then
     doit "curl -fLo '$auto' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
   fi
+  # create minimal init if missing (you can replace with your repo's config)
   if [ ! -f "$HOME/.config/nvim/init.vim" ] && [ ! -f "$HOME/.config/nvim/init.lua" ]; then
     doit "mkdir -p '$HOME/.config/nvim'"
     cat > "$HOME/.config/nvim/init.vim" <<'NVIMRC'
+" Minimal starter; replace with your full config or stow it
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'tpope/vim-sensible'
 " Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -198,10 +187,12 @@ call plug#end()
 NVIMRC
   fi
   if exists nvim; then
+    # headless install; do not fail script if plugins fail
     doit "nvim +'PlugInstall --sync' +qa || true"
   fi
 }
 
+# (Optional) classic Vim support (vim-plug)
 setup_vimplug_vim() {
   log "Installing vim-plug for classic Vim (optional)"
   local auto="$HOME/.vim/autoload/plug.vim"
@@ -228,13 +219,32 @@ install_nvm_node() {
   else
     log "nvm already present"
   fi
+  # shellcheck source=/dev/null
   if [ -f "$HOME/.nvm/nvm.sh" ]; then
+    # Ensure nvm loads in zsh
     ensure_line 'export NVM_DIR="$HOME/.nvm"' "$HOME/.zshrc"
     ensure_line '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' "$HOME/.zshrc"
+    # load nvm in this script context too
     . "$HOME/.nvm/nvm.sh"
     log "Installing Node LTS v${NODE_MAJOR}"
     doit "nvm install ${NODE_MAJOR} && nvm alias default ${NODE_MAJOR}"
   fi
+}
+
+# --------------- GNU stow dotfiles ---------------
+run_stow() {
+  local pkgs=("$@")
+  if [ "${#pkgs[@]}" -eq 0 ]; then
+    pkgs=("${STOW_PKGS_DEFAULT[@]}")
+  fi
+  log "Stowing packages: ${pkgs[*]}"
+  for pkg in "${pkgs[@]}"; do
+    if [ -d "${REPO_DIR}/${pkg}" ]; then
+      doit "stow -d '${REPO_DIR}' -t '$HOME' '${pkg}'"
+    else
+      log "Skip stow '${pkg}' (not found in ${REPO_DIR})"
+    fi
+  done
 }
 
 # --------------- Main ---------------
@@ -243,26 +253,22 @@ case "$OS" in
     install_base_debian
     install_editors_debian
     setup_zsh_default_shell_debian
-
-    # Stow *before* OMZ so your repo's .zshrc is in place
-    run_stow
-
     install_ohmyzsh
     setup_vimplug_nvim
-    # setup_vimplug_vim   # optional
+    # Uncomment if you also want classic Vim plugins:
+    # setup_vimplug_vim
     install_nvm_node
+    run_stow
     ;;
   macos)
     install_base_macos
     install_editors_macos
     setup_zsh_default_shell_macos
-
-    run_stow
-
     install_ohmyzsh
     setup_vimplug_nvim
     # setup_vimplug_vim
     install_nvm_node
+    run_stow
     ;;
   *)
     err "Unsupported OS. Exiting."
@@ -271,4 +277,4 @@ case "$OS" in
 esac
 
 log "Default shell recorded: $(getent passwd "$USER" 2>/dev/null | cut -d: -f7 || echo '(macOS: check chsh)')"
-log "✅ Bootstrap complete. If your prompt still looks like plain zsh, log out or reboot so the new login shell and Oh My Zsh fully apply."
+log "Done ✅"
