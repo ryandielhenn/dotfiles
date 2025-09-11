@@ -45,3 +45,25 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# ---------- Go toolchain (cross-platform safe) ----------
+# 1) If the official tarball install exists (common on Linux), add it.
+if [ -d /usr/local/go/bin ]; then
+  case ":$PATH:" in
+    *":/usr/local/go/bin:"*) ;;
+    *) export PATH="/usr/local/go/bin:$PATH" ;;
+  esac
+fi
+
+# 2) If 'go' is available, ensure GOPATH/bin is on PATH (for gopls, etc.).
+if command -v go >/dev/null 2>&1; then
+  GOPATH_DIR="$(go env GOPATH 2>/dev/null)"
+  [ -n "$GOPATH_DIR" ] || GOPATH_DIR="$HOME/go"
+  if [ -d "$GOPATH_DIR/bin" ]; then
+    case ":$PATH:" in
+      *":$GOPATH_DIR/bin:"*) ;;
+      *) export PATH="$GOPATH_DIR/bin:$PATH" ;;
+    esac
+  fi
+fi
+# ---------- end Go toolchain ----------
