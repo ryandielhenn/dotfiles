@@ -63,37 +63,54 @@ else
   log "Oh My Zsh already present"
 fi
 
-# -------- Prepare to stow: ensure OMZ default ~/.zshrc doesn't block us --------
+# -------- FORCE ~/.zshrc to be a symlink managed by stow --------
+TS="$(date +%Y%m%d-%H%M%S)"
 if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
-  log "Backing up existing non-symlink ~/.zshrc -> ~/.zshrc.omz.bak"
-  mv "$HOME/.zshrc" "$HOME/.zshrc.omz.bak"
+  BAK="$HOME/.zshrc.backup-$TS"
+  log "Backing up existing ~/.zshrc to $BAK and removing it so stow can link ours"
+  cp "$HOME/.zshrc" "$BAK"
+  rm -f "$HOME/.zshrc"
 fi
-# If a symlink exists but points somewhere else, remove it so stow can recreate
+
+# If it's a symlink but not pointing into DOTFILES_DIR/zsh, replace it.
 if [ -L "$HOME/.zshrc" ]; then
-  target="$(readlink -f "$HOME/.zshrc" || true)"
-  case "$target" in
-    "$DOTFILES_DIR"/*) : ;;  # good, from our repo
+  TARGET="$(readlink -f "$HOME/.zshrc" || true)"
+  case "$TARGET" in
+    "$DOTFILES_DIR"/*) ;;
     *)
-      log "Removing stray ~/.zshrc symlink (-> $target) to let stow recreate it"
+      BAK="$HOME/.zshrc.symlink-replaced-$TS"
+      log "Replacing existing symlinked ~/.zshrc (-> $TARGET). Backup at $BAK"
+      cp "$HOME/.zshrc" "$BAK" || true
       rm -f "$HOME/.zshrc"
       ;;
   esac
 fi
 
-# -------- Stow dotfiles (zsh) --------
+# -------- Stow dotfiles (zsh/ and nvim/ if present) --------
 if [ -d "$DOTFILES_DIR" ]; then
   log "Using DOTFILES_DIR=$DOTFILES_DIR"
   cd "$DOTFILES_DIR"
-  # Clean any prior stow links for zsh, then restow fresh
-  stow -D -t "$HOME" zsh >/dev/null 2>&1 || true
-  log "Stowing zsh/ (forcing our .zshrc to take precedence)"
-  stow -v -R -t "$HOME" zsh
+
+  if [ -d "zsh" ]; then
+    log "Stowing zsh/"
+    stow -v -R -t "$HOME" zsh
+  else
+    warn "No zsh/ directory in $DOTFILES_DIR; skipping zsh stow"
+  fi
+
+  if [ -d "nvim" ]; then
+    log "Stowing nvim/"
+    stow -v -R -t "$HOME" nvim
+  else
+    warn "No nvim/ directory in $DOTFILES_DIR; will fallback to minimal init.vim if needed"
+  fi
+
   cd - >/dev/null
 else
   warn "DOTFILES_DIR not found ($DOTFILES_DIR). Skipping stow."
 fi
 
-# -------- Ensure ~/.zshrc sources OMZ (idempotent safety net) --------
+# -------- Ensure ~/.zshrc sources OMZ (idempotent) --------
 if ! grep -q 'oh-my-zsh\.sh' "$HOME/.zshrc" 2>/dev/null; then
   log "Appending OMZ source block to ~/.zshrc"
   cat <<'EOF' >> "$HOME/.zshrc"
@@ -158,8 +175,7 @@ log "Ensuring vim-plug is installed (Vim/Neovim)"
 NVIM_AUTO="$HOME/.local/share/nvim/site/autoload"
 mkdir -p "$NVIM_AUTO"
 if [ ! -f "$NVIM_AUTO/plug.vim" ]; then
-  curl -fLo "$NVIM_AUTO/plug.vim" --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  curl -fLo "$NVIM_AUTO/plug.vim" --create-dirs     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   log "Installed vim-plug for Neovim"
 else
   log "vim-plug already present for Neovim"
@@ -168,18 +184,18 @@ fi
 VIM_AUTO="$HOME/.vim/autoload"
 mkdir -p "$VIM_AUTO"
 if [ ! -f "$VIM_AUTO/plug.vim" ]; then
-  curl -fLo "$VIM_AUTO/plug.vim" --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  curl -fLo "$VIM_AUTO/plug.vim" --create-dirs     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   log "Installed vim-plug for Vim"
 else
   log "vim-plug already present for Vim"
 fi
 
-# Create minimal init.vim if none exists
-if [ ! -f "$HOME/.config/nvim/init.vim" ] && [ ! -f "$HOME/.config/nvim/init.lua" ]; then
-  log "Creating minimal ~/.config/nvim/init.vim (replace with your dotfiles later)"
-  mkdir -p "$HOME/.config/nvim"
-  cat <<'EOF' > "$HOME/.config/nvim/init.vim"
+# Create minimal configs only if not provided by dotfiles
+if [ ! -d "$DOTFILES_DIR/nvim" ]; then
+  if [ ! -f "$HOME/.config/nvim/init.vim" ] && [ ! -f "$HOME/.config/nvim/init.lua" ]; then
+    log "Creating minimal ~/.config/nvim/init.vim (no nvim/ in dotfiles)"
+    mkdir -p "$HOME/.config/nvim"
+    cat <<'EOF' > "$HOME/.config/nvim/init.vim"
 " Minimal bootstrap init.vim (replace with your dotfiles' version)
 call plug#begin(stdpath('data') . '/plugged')
 Plug 'tpope/vim-surround'
@@ -189,9 +205,26 @@ call plug#end()
 set number
 syntax on
 EOF
+  fi
 fi
 
-# Auto-install plugins if a Plug block is present
+if [ ! -f "$HOME/.vimrc" ]; then
+  log "Creating minimal ~/.vimrc (no .vimrc found)"
+  cat <<'EOF' > "$HOME/.vimrc"
+set nocompatible
+filetype plugin indent on
+syntax on
+set number
+
+call plug#begin('~/.vim/plugged')
+Plug 'tpope/vim-surround'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+call plug#end()
+EOF
+fi
+
+# Detect Plug presence
 plug_present_nvim=0
 if [ -f "$HOME/.config/nvim/init.vim" ]; then
   if grep -q "plug#begin" "$HOME/.config/nvim/init.vim"; then
@@ -206,6 +239,7 @@ if [ -f "$HOME/.vimrc" ]; then
   fi
 fi
 
+# Run installers
 if command -v nvim >/dev/null 2>&1 && [ "$plug_present_nvim" = "1" ]; then
   log "Running PlugInstall for Neovim (headless)"
   nvim --headless +"PlugInstall --sync" +qa || warn "nvim PlugInstall returned non-zero; check your config"
@@ -222,6 +256,8 @@ echo "Verification:"
 echo "  SHELL set to: $(getent passwd "$USER" | cut -d: -f7)"
 echo "  OMZ dir exists: $( [ -d "$HOME/.oh-my-zsh" ] && echo yes || echo no )"
 echo "  .zshrc symlink: $( [ -L "$HOME/.zshrc" ] && echo yes || echo no )"
-echo "  .zshrc points to: $( [ -L "$HOME/.zshrc" ] && readlink -f "$HOME/.zshrc" || echo 'n/a')"
+echo "  .zshrc target: $( readlink -f "$HOME/.zshrc" 2>/dev/null || echo 'n/a' )"
+echo "  vim-plug (vim):  $( [ -f "$HOME/.vim/autoload/plug.vim" ] && echo yes || echo no )"
+echo "  vim-plug (nvim): $( [ -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ] && echo yes || echo no )"
 echo "  vim version: $(command -v vim >/dev/null 2>&1 && vim --version | head -n 1 || echo 'not found')"
 echo "  nvim version: $(command -v nvim >/dev/null 2>&1 && nvim --version | head -n 1 || echo 'not found')"
