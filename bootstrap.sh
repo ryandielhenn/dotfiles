@@ -165,7 +165,7 @@ maybe_chsh() {
   if chsh -s "$(command -v zsh)"; then
     log "Default shell changed to zsh. Log out/in to apply."
   else
-    log "Could not change shell (permission or PAM policy). Try manually: chsh -s "\$(command -v zsh)""
+    log "Could not change shell (permission or PAM policy). Try manually: chsh -s \"\$(command -v zsh)\""
   fi
 }
 
