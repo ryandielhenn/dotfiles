@@ -45,3 +45,30 @@ Examples:
 
   ./bootstrap.sh --packages zsh git
       # Only stow zsh and git configs (skip nvim)
+
+### Neovim + CoC Setup (Linux)
+
+To get `coc.nvim` working properly, you need a recent version of Vim/Neovim, a plugin manager, and Node.js (used by CoC for language servers).
+
+```bash
+# --- Install latest Neovim ---
+sudo add-apt-repository ppa:neovim-ppa/unstable -y
+sudo apt update
+sudo apt install -y neovim
+
+# (Optional) Install a modern Vim as fallback
+sudo add-apt-repository ppa:jonathonf/vim -y
+sudo apt update
+sudo apt install -y vim
+
+# --- Install vim-plug (plugin manager) ---
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# --- Install Node.js (LTS) ---
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# --- Install CoC plugins after starting nvim ---
+nvim +'PlugInstall --sync' +qa
+nvim +'CocInstall -sync coc-json coc-tsserver' +qa
