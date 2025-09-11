@@ -45,7 +45,7 @@ Examples:
 
   ./bootstrap.sh --packages zsh git
       # Only stow zsh and git configs (skip nvim)
-
+```
 ### Neovim + CoC Setup (Linux)
 
 To get `coc.nvim` working properly, you need a recent version of Vim/Neovim, a plugin manager, and Node.js (used by CoC for language servers).
