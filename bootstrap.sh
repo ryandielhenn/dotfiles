@@ -63,27 +63,37 @@ else
   log "Oh My Zsh already present"
 fi
 
+# -------- Prepare to stow: ensure OMZ default ~/.zshrc doesn't block us --------
+if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
+  log "Backing up existing non-symlink ~/.zshrc -> ~/.zshrc.omz.bak"
+  mv "$HOME/.zshrc" "$HOME/.zshrc.omz.bak"
+fi
+# If a symlink exists but points somewhere else, remove it so stow can recreate
+if [ -L "$HOME/.zshrc" ]; then
+  target="$(readlink -f "$HOME/.zshrc" || true)"
+  case "$target" in
+    "$DOTFILES_DIR"/*) : ;;  # good, from our repo
+    *)
+      log "Removing stray ~/.zshrc symlink (-> $target) to let stow recreate it"
+      rm -f "$HOME/.zshrc"
+      ;;
+  esac
+fi
+
 # -------- Stow dotfiles (zsh) --------
 if [ -d "$DOTFILES_DIR" ]; then
   log "Using DOTFILES_DIR=$DOTFILES_DIR"
   cd "$DOTFILES_DIR"
-  if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
-    log "Adopting existing ~/.zshrc into repo for stow management"
-    stow -v -R -t "$HOME" --adopt zsh || true
-    git status >/dev/null 2>&1 && warn "Review/commit adopted changes in your dotfiles repo."
-  fi
-
-  log "Stowing zsh/"
-  stow -v -R -t "$HOME" zsh || {
-    warn "stow encountered issues; retrying without --adopt"
-    stow -v -R -t "$HOME" zsh
-  }
+  # Clean any prior stow links for zsh, then restow fresh
+  stow -D -t "$HOME" zsh >/dev/null 2>&1 || true
+  log "Stowing zsh/ (forcing our .zshrc to take precedence)"
+  stow -v -R -t "$HOME" zsh
   cd - >/dev/null
 else
   warn "DOTFILES_DIR not found ($DOTFILES_DIR). Skipping stow."
 fi
 
-# -------- Ensure ~/.zshrc sources OMZ (idempotent) --------
+# -------- Ensure ~/.zshrc sources OMZ (idempotent safety net) --------
 if ! grep -q 'oh-my-zsh\.sh' "$HOME/.zshrc" 2>/dev/null; then
   log "Appending OMZ source block to ~/.zshrc"
   cat <<'EOF' >> "$HOME/.zshrc"
@@ -212,5 +222,6 @@ echo "Verification:"
 echo "  SHELL set to: $(getent passwd "$USER" | cut -d: -f7)"
 echo "  OMZ dir exists: $( [ -d "$HOME/.oh-my-zsh" ] && echo yes || echo no )"
 echo "  .zshrc symlink: $( [ -L "$HOME/.zshrc" ] && echo yes || echo no )"
+echo "  .zshrc points to: $( [ -L "$HOME/.zshrc" ] && readlink -f "$HOME/.zshrc" || echo 'n/a')"
 echo "  vim version: $(command -v vim >/dev/null 2>&1 && vim --version | head -n 1 || echo 'not found')"
 echo "  nvim version: $(command -v nvim >/dev/null 2>&1 && nvim --version | head -n 1 || echo 'not found')"
