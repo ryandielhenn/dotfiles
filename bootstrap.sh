@@ -71,8 +71,6 @@ if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
   cp "$HOME/.zshrc" "$BAK"
   rm -f "$HOME/.zshrc"
 fi
-
-# If it's a symlink but not pointing into DOTFILES_DIR/zsh, replace it.
 if [ -L "$HOME/.zshrc" ]; then
   TARGET="$(readlink -f "$HOME/.zshrc" || true)"
   case "$TARGET" in
@@ -250,6 +248,35 @@ if command -v vim >/dev/null 2>&1 && [ "$plug_present_vim" = "1" ]; then
   vim +'PlugInstall --sync' +qa || warn "vim PlugInstall returned non-zero; check your .vimrc"
 fi
 
+# ----- Install nvm + Node LTS (per-user) -----
+if [ ! -d "$HOME/.nvm" ]; then
+  log "Installing nvm"
+  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+fi
+
+# Ensure nvm loads for interactive and login shells
+if ! grep -q 'NVM_DIR=.*\.nvm' "$HOME/.zshrc" 2>/dev/null; then
+  cat >> "$HOME/.zshrc" <<'EOF'
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+EOF
+fi
+if ! grep -q 'NVM_DIR=.*\.nvm' "$HOME/.profile" 2>/dev/null; then
+  cat >> "$HOME/.profile" <<'EOF'
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+EOF
+fi
+
+# Load nvm now and install Node LTS if missing
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+if ! command -v node >/dev/null 2>&1; then
+  log "Installing Node.js LTS via nvm"
+  nvm install --lts
+  nvm alias default 'lts/*'
+fi
+
 log "Done. Open a new terminal or run: exec zsh"
 echo
 echo "Verification:"
@@ -261,3 +288,4 @@ echo "  vim-plug (vim):  $( [ -f "$HOME/.vim/autoload/plug.vim" ] && echo yes ||
 echo "  vim-plug (nvim): $( [ -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ] && echo yes || echo no )"
 echo "  vim version: $(command -v vim >/dev/null 2>&1 && vim --version | head -n 1 || echo 'not found')"
 echo "  nvim version: $(command -v nvim >/dev/null 2>&1 && nvim --version | head -n 1 || echo 'not found')"
+echo "  node version: $(command -v node >/dev/null 2>&1 && node -v || echo 'not found')"
