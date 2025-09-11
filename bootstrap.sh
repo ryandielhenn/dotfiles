@@ -4,12 +4,11 @@ set -euo pipefail
 # -------- Settings (you can override via env) --------
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 [ -d "$DOTFILES_DIR" ] || DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
-INSTALL_NEOVIM="${INSTALL_NEOVIM:-0}"   # set to 1 to install latest neovim (PPA)
 LOG_PREFIX="${LOG_PREFIX:-[bootstrap]}"
 
 log() { printf "\033[1;32m%s\033[0m %s\n" "$LOG_PREFIX" "$*"; }
 warn() { printf "\033[1;33m%s\033[0m %s\n" "$LOG_PREFIX" "$*"; }
-err() { printf "\033[1;31m%s\033[0m %s\n" "$LOG_PREFIX" "$*"; }
+err()  { printf "\033[1;31m%s\033[0m %s\n" "$LOG_PREFIX" "$*"; }
 
 need_sudo() {
   if command -v sudo >/dev/null 2>&1; then
@@ -19,16 +18,17 @@ need_sudo() {
   fi
 }
 
-APT_PKGS=(zsh git curl stow)
 SUDO="$(need_sudo)"
 
-# -------- OS/Package setup --------
+# ------- Base packages (includes vim + neovim, plus repo helpers) -------
+APT_PKGS=(zsh git curl stow vim ca-certificates software-properties-common)
+
 if command -v apt-get >/dev/null 2>&1; then
-  log "Installing packages: ${APT_PKGS[*]}"
+  log "Installing base packages: ${APT_PKGS[*]}"
   $SUDO apt-get update -y
   $SUDO apt-get install -y "${APT_PKGS[@]}"
 else
-  warn "apt-get not found; skipping package install (assuming packages exist)"
+  warn "apt-get not found; this script expects Debian/Ubuntu/Pop!_OS."
 fi
 
 # -------- Ensure default shell is zsh --------
@@ -70,7 +70,7 @@ if [ -d "$DOTFILES_DIR" ]; then
   if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
     log "Adopting existing ~/.zshrc into repo for stow management"
     stow -v -R -t "$HOME" --adopt zsh || true
-    git status >/dev/null 2>&1 && warn "Remember to review/commit adopted changes in your dotfiles repo."
+    git status >/dev/null 2>&1 && warn "Review/commit adopted changes in your dotfiles repo."
   fi
 
   log "Stowing zsh/"
@@ -127,15 +127,83 @@ esac
 EOF
 fi
 
-# -------- Optional Neovim --------
-if [ "$INSTALL_NEOVIM" = "1" ] && command -v add-apt-repository >/dev/null 2>&1; then
-  log "Installing latest Neovim via PPA"
-  $SUDO apt-get install -y software-properties-common
-  $SUDO add-apt-repository -y ppa:neovim-ppa/unstable
+# -------- Always add Neovim PPA & install latest neovim --------
+if command -v add-apt-repository >/dev/null 2>&1; then
+  if ! grep -Riq "neovim-ppa/unstable" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
+    log "Adding Neovim unstable PPA"
+    $SUDO add-apt-repository -y ppa:neovim-ppa/unstable
+  else
+    log "Neovim PPA already present"
+  fi
+  log "Installing/Upgrading Neovim"
   $SUDO apt-get update -y
   $SUDO apt-get install -y neovim
-elif [ "$INSTALL_NEOVIM" = "1" ]; then
-  warn "add-apt-repository not found; skipping Neovim PPA install"
+else
+  warn "add-apt-repository not available; cannot add Neovim PPA"
+fi
+
+# -------- vim-plug for Vim & Neovim (idempotent) --------
+log "Ensuring vim-plug is installed (Vim/Neovim)"
+# Neovim
+NVIM_AUTO="$HOME/.local/share/nvim/site/autoload"
+mkdir -p "$NVIM_AUTO"
+if [ ! -f "$NVIM_AUTO/plug.vim" ]; then
+  curl -fLo "$NVIM_AUTO/plug.vim" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  log "Installed vim-plug for Neovim"
+else
+  log "vim-plug already present for Neovim"
+fi
+# Vim
+VIM_AUTO="$HOME/.vim/autoload"
+mkdir -p "$VIM_AUTO"
+if [ ! -f "$VIM_AUTO/plug.vim" ]; then
+  curl -fLo "$VIM_AUTO/plug.vim" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  log "Installed vim-plug for Vim"
+else
+  log "vim-plug already present for Vim"
+fi
+
+# Create minimal init.vim if none exists
+if [ ! -f "$HOME/.config/nvim/init.vim" ] && [ ! -f "$HOME/.config/nvim/init.lua" ]; then
+  log "Creating minimal ~/.config/nvim/init.vim (replace with your dotfiles later)"
+  mkdir -p "$HOME/.config/nvim"
+  cat <<'EOF' > "$HOME/.config/nvim/init.vim"
+" Minimal bootstrap init.vim (replace with your dotfiles' version)
+call plug#begin(stdpath('data') . '/plugged')
+Plug 'tpope/vim-surround'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+call plug#end()
+set number
+syntax on
+EOF
+fi
+
+# Auto-install plugins if a Plug block is present
+plug_present_nvim=0
+if [ -f "$HOME/.config/nvim/init.vim" ]; then
+  if grep -q "plug#begin" "$HOME/.config/nvim/init.vim"; then
+    plug_present_nvim=1
+  fi
+fi
+
+plug_present_vim=0
+if [ -f "$HOME/.vimrc" ]; then
+  if grep -q "plug#begin" "$HOME/.vimrc"; then
+    plug_present_vim=1
+  fi
+fi
+
+if command -v nvim >/dev/null 2>&1 && [ "$plug_present_nvim" = "1" ]; then
+  log "Running PlugInstall for Neovim (headless)"
+  nvim --headless +"PlugInstall --sync" +qa || warn "nvim PlugInstall returned non-zero; check your config"
+fi
+
+if command -v vim >/dev/null 2>&1 && [ "$plug_present_vim" = "1" ]; then
+  log "Running PlugInstall for Vim (headless)"
+  vim +'PlugInstall --sync' +qa || warn "vim PlugInstall returned non-zero; check your .vimrc"
 fi
 
 log "Done. Open a new terminal or run: exec zsh"
@@ -144,3 +212,5 @@ echo "Verification:"
 echo "  SHELL set to: $(getent passwd "$USER" | cut -d: -f7)"
 echo "  OMZ dir exists: $( [ -d "$HOME/.oh-my-zsh" ] && echo yes || echo no )"
 echo "  .zshrc symlink: $( [ -L "$HOME/.zshrc" ] && echo yes || echo no )"
+echo "  vim version: $(command -v vim >/dev/null 2>&1 && vim --version | head -n 1 || echo 'not found')"
+echo "  nvim version: $(command -v nvim >/dev/null 2>&1 && nvim --version | head -n 1 || echo 'not found')"
