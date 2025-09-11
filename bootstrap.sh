@@ -146,8 +146,25 @@ install_oh_my_zsh() {
     if have dnf; then sudo dnf install -y curl; fi
     if have pacman; then sudo pacman -S --noconfirm curl; fi
   fi
-  log "Installing Oh My Zsh..."
-  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+  # Prevent OMZ from dropping a default ~/.zshrc that would conflict with stow
+  log "Installing Oh My Zsh (preserving existing ~/.zshrc if any)..."
+  KEEP_ZSHRC=yes RUNZSH=no CHSH=no \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+}
+
+ensure_shell_listed() {
+  # On macOS, Homebrew zsh path might not be in /etc/shells; add it to allow chsh
+  local zsh_path
+  zsh_path="$(command -v zsh || true)"
+  [ -z "$zsh_path" ] && return 0
+
+  if [ -f /etc/shells ] && ! grep -qx "$zsh_path" /etc/shells 2>/dev/null; then
+    if [ "$(uname -s)" = "Darwin" ]; then
+      log "Adding $zsh_path to /etc/shells so chsh is allowed (macOS)."
+      echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null || true
+    fi
+  fi
 }
 
 maybe_chsh() {
@@ -156,16 +173,38 @@ maybe_chsh() {
     log "zsh not installed; cannot change default shell."
     return
   fi
+
+  ensure_shell_listed
+
+  local current
   current="$(basename "${SHELL:-}")"
   if [[ "$current" == "zsh" ]]; then
     log "Default shell already zsh."
     return
   fi
+
+  # WSL note
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    log "WSL detected: chsh may not affect Windows Terminal profiles."
+  fi
+
   log "Changing default shell to zsh..."
   if chsh -s "$(command -v zsh)"; then
     log "Default shell changed to zsh. Log out/in to apply."
   else
     log "Could not change shell (permission or PAM policy). Try manually: chsh -s \"\$(command -v zsh)\""
+  fi
+}
+
+# --------------------------------------------
+# Prepare for stow (handle conflicts)
+# --------------------------------------------
+prepare_conflicts() {
+  # If OMZ created a real ~/.zshrc, back it up so stow can place a symlink
+  if [ -e "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
+    local backup="$HOME/.zshrc.pre-stow.$(date +%Y%m%d-%H%M%S)"
+    log "Found real ~/.zshrc (not a symlink); backing up to $backup"
+    mv "$HOME/.zshrc" "$backup"
   fi
 }
 
@@ -184,10 +223,12 @@ fi
 
 case "$MODE" in
   stow)
+    prepare_conflicts
     log "Stowing packages: ${PACKAGES[*]}"
     stow $STOW_FLAGS -t "$TARGET" "${PACKAGES[@]}"
     ;;
   restow)
+    prepare_conflicts
     log "Re-stowing packages: ${PACKAGES[*]}"
     stow $STOW_FLAGS -R -t "$TARGET" "${PACKAGES[@]}"
     ;;
