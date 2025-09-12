@@ -206,3 +206,19 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " Currently used for the formatOnType feature.
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
       \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" Enable system clipboard on Wayland using wl-clipboard
+if executable('wl-copy') && exists('$WAYLAND_DISPLAY')
+  let g:clipboard = {
+        \ 'name': 'wl-clipboard',
+        \ 'copy': {
+        \    '+': 'wl-copy --foreground --type text/plain',
+        \    '*': 'wl-copy --foreground --type text/plain',
+        \  },
+        \ 'paste': {
+        \    '+': 'wl-paste --no-newline',
+        \    '*': 'wl-paste --no-newline',
+        \  },
+        \ 'cache_enabled': 0,
+        \ }
+endif
