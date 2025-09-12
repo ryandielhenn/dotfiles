@@ -67,3 +67,24 @@ if command -v go >/dev/null 2>&1; then
   fi
 fi
 # ---------- end Go toolchain ----------
+
+# ---------------------------------------------------------
+# Wofi Toggle Function
+# - Launches Wofi with custom config + style if not running
+# - If Wofi is already running, kills it (toggle behavior)
+# ---------------------------------------------------------
+wofi-toggle() {
+  # Only run on Linux + Wayland
+  [[ "$OSTYPE" == "linux-gnu"* ]] || return 0
+  [[ -n "$WAYLAND_DISPLAY" ]] || return 0
+  command -v wofi >/dev/null 2>&1 || return 0
+
+  local CONFIG="$HOME/.config/wofi/config/config"
+  local STYLE="$HOME/.config/wofi/src/mocha/style.css"
+
+  if ! pidof wofi >/dev/null 2>&1; then
+    wofi --conf "${CONFIG}" --style "${STYLE}"
+  else
+    pkill -x wofi
+  fi
+}
