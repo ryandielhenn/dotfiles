@@ -8,7 +8,7 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything v
 ## Features
 
 - Keep configs in `~/.dotfiles`, `./bootstrap.sh` symlinks them back into `$HOME`
-- Clean separation: `zsh/`, `nvim/`, `git/`
+- Clean separation: `zsh/`, `nvim/`, `git/`, `alacritty/`
 - Ignores runtime files like history and caches
 - Portable: works on macOS and Linux
 
@@ -72,3 +72,41 @@ sudo apt install -y nodejs
 # --- Install CoC plugins after starting nvim ---
 nvim +'PlugInstall --sync' +qa
 nvim +'CocInstall -sync coc-json coc-tsserver' +qa
+```
+### Alacritty (Optional)
+Use [Alacritty](https://github.com/alacritty/alacritty/tree/master) as default shell.
+
+### Verify symlinks
+```text
+➜  ~ tree -a -P ".*" -L 1 ~
+/Users/dielhennr
+.
+.
+.
+├── .editorconfig -> .dotfiles/editorconfig/.editorconfig
+├── .gitconfig -> .dotfiles/git/.gitconfig
+.
+.
+.
+├── .zprofile -> .dotfiles/zsh/.zprofile
+├── .zsh_aliases -> .dotfiles/zsh/.zsh_aliases
+.
+.
+.
+├── .zshrc -> .dotfiles/zsh/.zshrc
+```
+
+```text
+➜  ~ tree -L 2 -f -l .config
+.config
+├── .config/../.dotfiles/alacritty/.config/alacritty -> ../.dotfiles/alacritty/.config/alacritty
+│   ├── .config/../.dotfiles/alacritty/.config/alacritty/alacritty.toml
+│   └── .config/../.dotfiles/alacritty/.config/alacritty/catppuccin-mocha.toml
+.
+.
+.
+└── .config/../.dotfiles/nvim/.config/nvim -> ../.dotfiles/nvim/.config/nvim
+    ├── .config/../.dotfiles/nvim/.config/nvim/after
+    └── .config/../.dotfiles/nvim/.config/nvim/init.vim
+```
+
