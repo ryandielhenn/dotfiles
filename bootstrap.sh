@@ -4,7 +4,7 @@ set -euo pipefail
 # --------------------------------------------
 # Config
 # --------------------------------------------
-PACKAGES=("zsh" "nvim" "git")   # stow these subfolders
+PACKAGES=("zsh" "nvim" "git" "alacritty")   # stow these subfolders
 TARGET="$HOME"                  # where to symlink to
 DRY_RUN=0                       # set via --dry-run
 NO_OMZ=0                        # set via --no-ohmyzsh
@@ -206,6 +206,20 @@ prepare_conflicts() {
     log "Found real ~/.zshrc (not a symlink); backing up to $backup"
     mv "$HOME/.zshrc" "$backup"
   fi
+  
+  # Ensure ~/.config exists (macOS/Linux)
+  mkdir -p "$HOME/.config"
+
+  # If user already has Alacritty files, back up conflicting REAL files so stow can link
+  if [ -d "$HOME/.config/alacritty" ] && [ ! -L "$HOME/.config/alacritty" ]; then
+    for f in alacritty.toml catppuccin-mocha.toml; do
+      if [ -e "$HOME/.config/alacritty/$f" ] && [ ! -L "$HOME/.config/alacritty/$f" ]; then
+        local backup="$HOME/.config/alacritty/${f}.pre-stow.$(date +%Y%m%d-%H%M%S)"
+        log "Backing up existing ~/.config/alacritty/$f -> $backup"
+        mv "$HOME/.config/alacritty/$f" "$backup"
+      fi
+    done
+  fi
 }
 
 # --------------------------------------------
@@ -241,7 +255,7 @@ esac
 if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
   log ""
   log "Verify symlinks (examples):"
-  for f in "$HOME/.zshrc" "$HOME/.gitconfig" "$HOME/.config/nvim/init.vim"; do
+  for f in "$HOME/.zshrc" "$HOME/.gitconfig" "$HOME/.config/nvim/init.vim" "$HOME/.config/alacritty/alacritty.toml"; do
     [ -e "$f" ] && ls -l "$f" || true
   done
   log ""
