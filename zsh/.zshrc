@@ -72,6 +72,11 @@ fi
 # Wofi Toggle Function
 # - Launches Wofi with custom config + style if not running
 # - If Wofi is already running, kills it (toggle behavior)
+# - Install 
+#
+# TODO update bootstrap.sh
+# - cd ~.config
+# - clone repo at https://github.com/quantumfate/wofi
 # ---------------------------------------------------------
 wofi-toggle() {
   # Only run on Linux + Wayland
