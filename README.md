@@ -82,15 +82,11 @@ Use [Alacritty](https://github.com/alacritty/alacritty/tree/master) as default s
 /Users/dielhennr
 .
 .
-.
-├── .editorconfig -> .dotfiles/editorconfig/.editorconfig
 ├── .gitconfig -> .dotfiles/git/.gitconfig
-.
 .
 .
 ├── .zprofile -> .dotfiles/zsh/.zprofile
 ├── .zsh_aliases -> .dotfiles/zsh/.zsh_aliases
-.
 .
 .
 ├── .zshrc -> .dotfiles/zsh/.zshrc
@@ -102,7 +98,6 @@ Use [Alacritty](https://github.com/alacritty/alacritty/tree/master) as default s
 ├── .config/../.dotfiles/alacritty/.config/alacritty -> ../.dotfiles/alacritty/.config/alacritty
 │   ├── .config/../.dotfiles/alacritty/.config/alacritty/alacritty.toml
 │   └── .config/../.dotfiles/alacritty/.config/alacritty/catppuccin-mocha.toml
-.
 .
 .
 └── .config/../.dotfiles/nvim/.config/nvim -> ../.dotfiles/nvim/.config/nvim
