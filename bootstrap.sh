@@ -252,10 +252,50 @@ case "$MODE" in
     ;;
 esac
 
+stow_hypr_if_applicable() {
+  # Only on Linux + Hyprland present
+  if [[ "$(uname -s)" != "Linux" ]] || ! have hyprctl; then
+    log "Hyprland not detected; skipping Hypr config."
+    return
+  fi
+
+  # Always stow hypr into ~/.config/hypr
+  local hypr_pkg="hypr"
+  local hypr_pkg_target="$HOME/.config/hypr"
+
+  mkdir -p "$hypr_pkg_target"
+
+  if [[ "$MODE" != "unstow" ]]; then
+    local conf="$hypr_pkg_target/hyprland.conf"
+    if [[ -e "$conf" && ! -L "$conf" ]]; then
+      local backup="${conf}.pre-stow.$(date +%Y%m%d-%H%M%S)"
+      log "Backing up existing $conf -> $backup"
+      mv "$conf" "$backup"
+    fi
+  fi
+
+  case "$MODE" in
+    stow)
+      log "Stowing Hyprland config → $hypr_pkg_target"
+      stow $STOW_FLAGS -t "$hypr_pkg_target" "$hypr_pkg"
+      ;;
+    restow)
+      log "Re-stowing Hyprland config → $hypr_pkg_target"
+      stow $STOW_FLAGS -R -t "$hypr_pkg_target" "$hypr_pkg"
+      ;;
+    unstow)
+      log "Unstowing Hyprland config ← $hypr_pkg_target"
+      stow $STOW_FLAGS -D -t "$hypr_pkg_target" "$hypr_pkg"
+      ;;
+  esac
+}
+
+stow_hypr_if_applicable
+
 if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
   log ""
   log "Verify symlinks (examples):"
-  for f in "$HOME/.zshrc" "$HOME/.gitconfig" "$HOME/.config/nvim/init.vim" "$HOME/.config/alacritty/alacritty.toml"; do
+  for f in "$HOME/.zshrc" "$HOME/.gitconfig" "$HOME/.config/nvim/init.vim" "$HOME/.config/alacritty/alacritty.toml" "$HOME/.config/hypr/hyprland.conf"; do
     [ -e "$f" ] && ls -l "$f" || true
   done
   log ""
