@@ -47,37 +47,34 @@ let g:airline_section_c = '%{coc#status()}'
 " Clipboard: OSC52 (SSH-safe) with local fallbacks
 " =========================
 lua << EOF
-local function has(cmd) return vim.fn.executable(cmd) == 1 end
-local function copy(lines, _) require('osc52').copy(table.concat(lines, '\n')) end
-local function paste() return { vim.fn.getreg('+') }, vim.fn.getregtype('+') end
+local ok, osc52 = pcall(require, 'osc52')
+if not ok then return end
 
--- Prefer OSC52 everywhere (works locally + over SSH)
+-- Store last yank so paste() never calls @+ recursively
+local last = { lines = nil, regtype = 'v' }
+
+local function copy(lines, regtype)
+  last.lines = vim.deepcopy(lines)
+  last.regtype = regtype or 'v'
+  osc52.copy(table.concat(lines, '\n'))
+end
+
+local function paste()
+  if last.lines then
+    return last.lines, last.regtype
+  end
+  local s = vim.fn.getreg('"')
+  return vim.split(s, '\n', { plain = true, trimempty = false }), vim.fn.getregtype('"')
+end
+
 vim.g.clipboard = {
-  name = 'osc52',
-  copy = { ['+'] = copy, ['*'] = copy },
+  name  = 'osc52',
+  copy  = { ['+'] = copy, ['*'] = copy },
   paste = { ['+'] = paste, ['*'] = paste },
 }
 
--- Optional fallback if OSC52 unavailable
-if not pcall(require, 'osc52') then
-  if has('wl-copy') then
-    vim.g.clipboard = {
-      name = 'wl-clipboard',
-      copy = { ['+'] = 'wl-copy', ['*'] = 'wl-copy --primary' },
-      paste = { ['+'] = 'wl-paste --no-newline', ['*'] = 'wl-paste --primary --no-newline' },
-      cache_enabled = 0,
-    }
-  elseif has('xclip') then
-    vim.g.clipboard = {
-      name = 'xclip',
-      copy = { ['+'] = 'xclip -selection clipboard', ['*'] = 'xclip -selection primary' },
-      paste = { ['+'] = 'xclip -selection clipboard -o', ['*'] = 'xclip -selection primary -o' },
-      cache_enabled = 0,
-    }
-  end
-end
+vim.opt.clipboard = 'unnamedplus'
 EOF
-set clipboard=unnamedplus
 
 " =========================
 " Yank highlight (Catppuccin-aware)
