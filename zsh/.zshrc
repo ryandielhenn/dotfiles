@@ -105,53 +105,6 @@ wofi-toggle() {
     pkill -x wofi
   fi
 }
-wallpicker-dir() {
-  local BASE="${1:-$HOME/Pictures/wallpapers}"
-  local CFG_DIR="$HOME/.config/wallpicker"
-  mkdir -p "$CFG_DIR"
 
-  # Use wofi_cmd if you have it; otherwise plain wofi
-  local WOFI="wofi --dmenu --prompt 'Choose wallpaper directory'"
-  command -v wofi_cmd >/dev/null 2>&1 && WOFI="wofi_cmd --dmenu --prompt 'Choose wallpaper directory'"
-
-  [[ -d "$BASE" ]] || { echo "Base not found: $BASE" >&2; return 1; }
-
-  # Build relative list, skip hidden dirs (.git, .whatever)
-  local list
-  list="$(
-    {
-      echo "(root)"
-      find "$BASE" -mindepth 1 -type d \
-        ! -regex ".*/\..*" \               # exclude any hidden directories
-        -printf "%P\n" 2>/dev/null | sort
-    }
-  )"
-
-  # Fallback if list is empty
-  if [[ -z "$list" || "$list" = "(root)" ]]; then
-    list="$(
-      {
-        echo "(root)"
-        find "$BASE" -type d ! -regex ".*/\..*" -print 2>/dev/null \
-          | sed -E "s|^$BASE/||" | sed -n '2,$p' | sort
-      }
-    )"
-  fi
-
-  [[ -z "$list" || "$list" = "(root)" ]] && { echo "No subdirectories found under $BASE"; return 1; }
-
-  local choice
-  choice="$(printf '%s\n' $list | eval "$WOFI")" || return 1
-  [[ -z "$choice" ]] && return 0
-
-  local full
-  if [[ "$choice" == "(root)" ]]; then
-    full="$BASE"
-  else
-    full="$BASE/$choice"
-  fi
-
-  printf '%s\n' "$full" > "$CFG_DIR/current_dir"
-  echo "Selected: $full"
-}
-
+# Created by `pipx` on 2025-09-18 08:37:30
+export PATH="$PATH:/home/ryan/.local/bin"
