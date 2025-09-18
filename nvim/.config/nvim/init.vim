@@ -104,6 +104,7 @@ nnoremap <silent> <leader>ff :Files<CR>
 nnoremap <silent> <leader>fg :Rg<Space>
 nnoremap <silent> <leader>fb :Buffers<CR>
 nnoremap <silent> <leader>fe :Lexplore<CR>
+nnoremap <silent> gf :GFiles<CR>
 
 " =========================
 " FZF ripgrep helper
