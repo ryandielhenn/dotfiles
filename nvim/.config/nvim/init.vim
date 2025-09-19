@@ -38,6 +38,9 @@ call plug#end()
 " Theme & UI
 " =========================
 colorscheme everforest
+set termguicolors
+highlight Visual guibg=#3a4248 guifg=NONE gui=NONE
+
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_theme = 'everforest'
@@ -77,13 +80,15 @@ vim.opt.clipboard = 'unnamedplus'
 EOF
 
 " =========================
-" Yank highlight (Catppuccin-aware)
+" Yank highlight (Everforest)
 " =========================
-if exists('g:colors_name') && g:colors_name =~ 'catppuccin'
-  highlight YankHighlight guibg=#b4befe guifg=NONE gui=bold
+if exists('g:colors_name') && g:colors_name =~ 'everforest'
+  " Everforest accent green background, no foreground change
+  highlight YankHighlight guibg=#a7c080 guifg=NONE gui=bold
 else
   highlight YankHighlight guibg=#444444 guifg=#ffffff gui=bold
 endif
+
 augroup highlight_yank
   autocmd!
   autocmd TextYankPost * silent! lua vim.highlight.on_yank({ higroup="YankHighlight", timeout=150 })

@@ -85,7 +85,7 @@ fi
 # ---------------------------------------------------------
 # --- wofi paths (edit these once) ---
 WOFI_CONF="$HOME/.config/wofi/config/config"
-WOFI_STYLE="$HOME/.config/wofi/src/mocha/style.css"
+WOFI_STYLE="$HOME/.config/wofi/src/everforest/style.css"
 
 # Helper to always call wofi with the same styling
 wofi_cmd() {
