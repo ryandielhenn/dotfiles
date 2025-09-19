@@ -18,4 +18,4 @@ family = "FiraCode Nerd Font"
 style  = "Italic"
 
 [general]
-import = [ "~/.config/alacritty/catppuccin-mocha.toml" ]
+import = [ "~/.config/alacritty/everforest.toml" ]

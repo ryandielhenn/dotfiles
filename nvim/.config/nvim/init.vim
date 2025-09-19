@@ -18,7 +18,7 @@ let g:editorconfig = v:false
 " Plugins (vim-plug)
 " =========================
 call plug#begin('~/.vim/plugged')
-  Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
+  Plug 'sainnhe/everforest'
   Plug 'ojroques/nvim-osc52'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
@@ -37,10 +37,10 @@ call plug#end()
 " =========================
 " Theme & UI
 " =========================
-colorscheme catppuccin-mocha
+colorscheme everforest
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
-let g:airline_theme = 'catppuccin'
+let g:airline_theme = 'everforest'
 let g:airline_section_c = '%{coc#status()}'
 
 " =========================
