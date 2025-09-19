@@ -106,5 +106,5 @@ wofi-toggle() {
   fi
 }
 
-# Created by `pipx` on 2025-09-18 08:37:30
-export PATH="$PATH:/home/ryan/.local/bin"
+[ -d "$HOME/.local/bin" ] && export PATH="$PATH:$HOME/.local/bin"
+[ -d "$HOME/.spicetify" ] && export PATH="$PATH:$HOME/.spicetify"
