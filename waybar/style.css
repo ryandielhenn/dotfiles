@@ -1,0 +1,107 @@
+/* Everforest Dark — floating pills, fully transparent bar */
+
+@define-color base       rgba(43, 51, 57, 0.65);  /* main background (everforest bg0) */
+@define-color surface    rgba(50, 60, 65, 0.75);  /* slightly lighter bg1 */
+@define-color crust      rgba(35, 42, 46, 0.85);  /* darker bg2 */
+
+@define-color text       #d3c6aa; /* fg */
+@define-color muted      #a7c080; /* green accent */
+@define-color aqua       #7fbbb3; /* alt accent */
+@define-color yellow     #dbbc7f;
+@define-color orange     #e69875;
+@define-color red        #e67e80;
+
+* {
+  font-family: "FiraCode Nerd Font", "JetBrainsMono Nerd Font", system-ui, sans-serif;
+  font-size: 13px;
+  color: @text;
+  border: none;
+}
+
+/* fully transparent bar */
+window#waybar {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* kill any theme-inherited borders/backgrounds */
+window#waybar > box,
+window#waybar > box > * {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* spacing between module groups */
+.modules-left, .modules-center, .modules-right { margin: 0 6px; }
+
+/* floating pill containers — EXCLUDE #window here */
+#workspaces,
+#pulseaudio, #network, #backlight, #memory,
+#battery, #clock, #tray, #idle_inhibitor, #power-profiles-daemon, #custom-power {
+  background: @base;
+  border: 1px solid alpha(@crust, 0.8);
+  border-radius: 14px;
+  padding: 6px 10px;
+  margin: 6px 4px;
+}
+
+/* workspaces: soft green highlight */
+#workspaces { padding: 4px 6px; }
+#workspaces button {
+  background: transparent;
+  padding: 4px 10px;
+  margin: 0 3px;
+  border-radius: 12px;
+}
+#workspaces button.active {
+  background: alpha(@muted, 0.20);
+  color: @muted;
+}
+#workspaces button.urgent { background: alpha(@red, 0.25); }
+#workspaces button:hover { background: alpha(@aqua, 0.15); }
+
+/* battery + pulse states */
+#battery.warning  { background: alpha(@yellow, 0.18); color: @yellow; }
+#battery.critical { background: alpha(@red, 0.18); color: @red; }
+#pulseaudio.muted { color: @yellow; }
+
+/* per-module accent borders */
+#pulseaudio  { border-color: alpha(@aqua, 0.35); }
+#network     { border-color: alpha(@muted, 0.35); }
+#battery     { border-color: alpha(@muted, 0.35); }
+#clock       { border-color: alpha(@aqua, 0.35); }
+
+/* tray */
+#tray { padding-right: 8px; }
+#tray > .needs-attention {
+  background: alpha(@red, 0.25);
+  border-radius: 10px;
+}
+
+/* tooltips */
+tooltip {
+  background: @surface;
+  border: 1px solid alpha(@crust, 0.9);
+  border-radius: 10px;
+}
+tooltip label { color: @text; padding: 6px 8px; }
+
+/* remove legacy shadows */
+button, button:hover { box-shadow: none; }
+
+/************ Hyprland window pill: **************/
+#window > label,
+#hyprland-window > label {
+  background: @base;
+  border: 1px solid alpha(@aqua, 0.30);
+  border-radius: 14px;
+  padding: 6px 10px;
+  margin: 4px 4px;
+  color: @text;
+  font-size: 13px;
+}
+
