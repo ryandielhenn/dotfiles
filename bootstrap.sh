@@ -197,29 +197,29 @@ maybe_chsh() {
 }
 
 # --------------------------------------------
-# Prepare for stow (handle conflicts)
+# Back up anything that would block stowing a given package
 # --------------------------------------------
-prepare_conflicts() {
-  # If OMZ created a real ~/.zshrc, back it up so stow can place a symlink
-  if [ -e "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
-    local backup="$HOME/.zshrc.pre-stow.$(date +%Y%m%d-%H%M%S)"
-    log "Found real ~/.zshrc (not a symlink); backing up to $backup"
-    mv "$HOME/.zshrc" "$backup"
+# Backup helper
+backup_if_real_not_symlink() {
+  local p="$1"
+  if [[ -e "$p" && ! -L "$p" ]]; then
+    local backup="${p}.pre-stow.$(date +%Y%m%d-%H%M%S)"
+    log "Backing up $p -> $backup"
+    mv "$p" "$backup"
   fi
-  
-  # Ensure ~/.config exists (macOS/Linux)
+}
+
+backup_conflicts_for_pkg() {
+  local pkg="$1"
+  # Ensure parent ~/.config exists (safe no-op if already there)
   mkdir -p "$HOME/.config"
 
-  # If user already has Alacritty files, back up conflicting REAL files so stow can link
-  if [ -d "$HOME/.config/alacritty" ] && [ ! -L "$HOME/.config/alacritty" ]; then
-    for f in alacritty.toml catppuccin-mocha.toml; do
-      if [ -e "$HOME/.config/alacritty/$f" ] && [ ! -L "$HOME/.config/alacritty/$f" ]; then
-        local backup="$HOME/.config/alacritty/${f}.pre-stow.$(date +%Y%m%d-%H%M%S)"
-        log "Backing up existing ~/.config/alacritty/$f -> $backup"
-        mv "$HOME/.config/alacritty/$f" "$backup"
-      fi
-    done
-  fi
+  # Ask stow what it would link; free those targets if they’re not symlinks
+  stow -n -v -t "$TARGET" "$pkg" 2>&1 | awk '
+    $1 ~ /^(LINK:|RELINK:)/ { print $2 }
+  ' | while IFS= read -r target; do
+    backup_if_real_not_symlink "$target"
+  done
 }
 
 # --------------------------------------------
@@ -236,15 +236,13 @@ if (( DRY_RUN == 1 )); then
 fi
 
 case "$MODE" in
-  stow)
-    prepare_conflicts
-    log "Stowing packages: ${PACKAGES[*]}"
-    stow $STOW_FLAGS -t "$TARGET" "${PACKAGES[@]}"
-    ;;
-  restow)
-    prepare_conflicts
-    log "Re-stowing packages: ${PACKAGES[*]}"
-    stow $STOW_FLAGS -R -t "$TARGET" "${PACKAGES[@]}"
+  stow|restow)
+    # Back up conflicts dynamically
+    for pkg in "${PACKAGES[@]}"; do
+      backup_conflicts_for_pkg "$pkg"
+    done
+    log "$([[ "$MODE" == "restow" ]] && echo "Re-stowing" || echo "Stowing") packages: ${PACKAGES[*]}"
+    stow $STOW_FLAGS $([[ "$MODE" == "restow" ]] && echo "-R") -t "$TARGET" "${PACKAGES[@]}"
     ;;
   unstow)
     log "Unstowing packages: ${PACKAGES[*]}"
@@ -253,95 +251,53 @@ case "$MODE" in
 esac
 
 stow_hypr_if_applicable() {
-  # Only on Linux + Hyprland present
   if [[ "$(uname -s)" != "Linux" ]] || ! have hyprctl; then
     log "Hyprland not detected; skipping Hypr config."
     return
   fi
+  [[ -d "hypr/.config/hypr" ]] || { log "Expected 'hypr/.config/hypr'."; return; }
 
-  # Always stow hypr into ~/.config/hypr
-  local hypr_pkg="hypr"
-  local hypr_pkg_target="$HOME/.config/hypr"
-
-  mkdir -p "$hypr_pkg_target"
-
-  if [[ "$MODE" != "unstow" ]]; then
-    local conf="$hypr_pkg_target/hyprland.conf"
-    if [[ -e "$conf" && ! -L "$conf" ]]; then
-      local backup="${conf}.pre-stow.$(date +%Y%m%d-%H%M%S)"
-      log "Backing up existing $conf -> $backup"
-      mv "$conf" "$backup"
-    fi
-  fi
+  # parent only; do NOT mkdir ~/.config/hypr (we want a dir symlink there)
+  mkdir -p "$HOME/.config"
+  [[ "$MODE" != "unstow" ]] && backup_conflicts_for_pkg hypr
 
   case "$MODE" in
-    stow)
-      log "Stowing Hyprland config → $hypr_pkg_target"
-      stow $STOW_FLAGS -t "$hypr_pkg_target" "$hypr_pkg"
-      ;;
-    restow)
-      log "Re-stowing Hyprland config → $hypr_pkg_target"
-      stow $STOW_FLAGS -R -t "$hypr_pkg_target" "$hypr_pkg"
-      ;;
-    unstow)
-      log "Unstowing Hyprland config ← $hypr_pkg_target"
-      stow $STOW_FLAGS -D -t "$hypr_pkg_target" "$hypr_pkg"
-      ;;
+    stow)   log "Stowing Hyprland → $TARGET"; stow $STOW_FLAGS -t "$TARGET" hypr ;;
+    restow) log "Re-stowing Hyprland → $TARGET"; stow $STOW_FLAGS -R -t "$TARGET" hypr ;;
+    unstow) log "Unstowing Hyprland ← $TARGET"; stow $STOW_FLAGS -D -t "$TARGET" hypr ;;
+  esac
+}
+
+stow_waybar_if_applicable() {
+  if [[ "$(uname -s)" != "Linux" ]] || ! have waybar; then
+    log "Waybar not detected; skipping Waybar config."
+    return
+  fi
+  [[ -d "waybar/.config/waybar" ]] || { log "Expected 'waybar/.config/waybar'."; return; }
+
+  mkdir -p "$HOME/.config"
+  [[ "$MODE" != "unstow" ]] && backup_conflicts_for_pkg waybar
+
+  case "$MODE" in
+    stow)   log "Stowing Waybar → $TARGET"; stow $STOW_FLAGS -t "$TARGET" waybar ;;
+    restow) log "Re-stowing Waybar → $TARGET"; stow $STOW_FLAGS -R -t "$TARGET" waybar ;;
+    unstow) log "Unstowing Waybar ← $TARGET"; stow $STOW_FLAGS -D -t "$TARGET" waybar ;;
   esac
 }
 
 stow_hypr_if_applicable
-
-stow_waybar_if_applicable() {
-  # Only on Linux + waybar installed
-  if [[ "$(uname -s)" != "Linux" ]] || ! command -v waybar >/dev/null; then
-    log "Waybar not detected; skipping Waybar config."
-    return
-  fi
-
-  local waybar_pkg="waybar"
-  local waybar_pkg_target="$HOME/.config/waybar"
-
-  mkdir -p "$waybar_pkg_target"
-
-  if [[ "$MODE" != "unstow" ]]; then
-    # Back up any existing non-symlinked config files
-    local conf="$waybar_pkg_target/config.jsonc"
-    if [[ -e "$conf" && ! -L "$conf" ]]; then
-      local backup="${conf}.pre-stow.$(date +%Y%m%d-%H%M%S)"
-      log "Backing up existing $conf -> $backup"
-      mv "$conf" "$backup"
-    fi
-    local style="$waybar_pkg_target/style.css"
-    if [[ -e "$style" && ! -L "$style" ]]; then
-      local backup="${style}.pre-stow.$(date +%Y%m%d-%H%M%S)"
-      log "Backing up existing $style -> $backup"
-      mv "$style" "$backup"
-    fi
-  fi
-
-  case "$MODE" in
-    stow)
-      log "Stowing Waybar config → $waybar_pkg_target"
-      stow $STOW_FLAGS -t "$waybar_pkg_target" "$waybar_pkg"
-      ;;
-    restow)
-      log "Re-stowing Waybar config → $waybar_pkg_target"
-      stow $STOW_FLAGS -R -t "$waybar_pkg_target" "$waybar_pkg"
-      ;;
-    unstow)
-      log "Unstowing Waybar config ← $waybar_pkg_target"
-      stow $STOW_FLAGS -D -t "$waybar_pkg_target" "$waybar_pkg"
-      ;;
-  esac
-}
-
 stow_waybar_if_applicable
 
 if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
   log ""
   log "Verify symlinks (examples):"
-  for f in "$HOME/.zshrc" "$HOME/.gitconfig" "$HOME/.config/nvim/init.vim" "$HOME/.config/alacritty/alacritty.toml" "$HOME/.config/hypr/hyprland.conf"; do
+  for f in "$HOME/.zshrc" \
+        "$HOME/.gitconfig" \
+        "$HOME/.config/nvim" \
+        "$HOME/.config/alacritty" \
+        "$HOME/.config/hypr" \
+        "$HOME/.config/waybar"
+    do
     [ -e "$f" ] && ls -l "$f" || true
   done
   log ""
