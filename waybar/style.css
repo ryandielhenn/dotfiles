@@ -39,7 +39,7 @@ window#waybar > box > * {
 .modules-left, .modules-center, .modules-right { margin: 0 6px; }
 
 /* floating pill containers — EXCLUDE #window here */
-#workspaces,
+#workspaces, #cpuinfo,
 #pulseaudio, #network, #backlight, #memory,
 #battery, #clock, #tray, #idle_inhibitor, #power-profiles-daemon, #custom-power {
   background: @base;
@@ -92,16 +92,3 @@ tooltip label { color: @text; padding: 6px 8px; }
 
 /* remove legacy shadows */
 button, button:hover { box-shadow: none; }
-
-/************ Hyprland window pill: **************/
-#window > label,
-#hyprland-window > label {
-  background: @base;
-  border: 1px solid alpha(@aqua, 0.30);
-  border-radius: 14px;
-  padding: 6px 10px;
-  margin: 4px 4px;
-  color: @text;
-  font-size: 13px;
-}
-

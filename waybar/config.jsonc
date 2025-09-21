@@ -6,7 +6,7 @@
 
   "modules-left": [
     "hyprland/workspaces",
-    "hyprland/window"
+    "group/cpuinfo"
   ],
   "modules-center": [],
   "modules-right": [
@@ -15,6 +15,7 @@
     "network",
     "clock"
   ],
+
   "hyprland/workspaces": {
     "disable-scroll": true,
     "all-outputs": false,
@@ -23,13 +24,32 @@
     "on-scroll-down": "hyprctl dispatch workspace e-1"
   },
 
-    "hyprland/window": {
-      "format": "{title}",
-      "format-if": "title && string.length(title) > 0",
-      "max-length": 80,
-      "separate-outputs": false,
-      "tooltip": false
-    },
+  "group/cpuinfo": {
+    "orientation": "horizontal",
+    "modules": ["cpu", "custom/busycores", "temperature"]
+  },
+
+  "cpu": {
+    "interval": 2,
+    "format": "{usage:>3}%  ",
+    "max-length": 10
+  },
+
+  "custom/busycores": {
+    "exec": "~/.local/bin/waybar-busycores",
+    "interval": 2,
+    "return-type": "text",
+    "format": " | {} 󱇫 ",   // literal glyph here
+    "tooltip": false
+  },
+
+  "temperature": {
+    "interval": 2,
+    "critical-threshold": 90,
+    "format": " | {temperatureC}°C ",
+    "format-critical": " | {temperatureC}°C ",
+    "hwmon-path": "/sys/class/hwmon/hwmon4/temp1_input"
+  },
 
   "clock": {
     "format": "{:%a %b %d  %I:%M %p}",
@@ -67,4 +87,3 @@
     "spacing": 8
   }
 }
-

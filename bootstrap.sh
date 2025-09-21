@@ -292,6 +292,52 @@ stow_hypr_if_applicable() {
 
 stow_hypr_if_applicable
 
+stow_waybar_if_applicable() {
+  # Only on Linux + waybar installed
+  if [[ "$(uname -s)" != "Linux" ]] || ! command -v waybar >/dev/null; then
+    log "Waybar not detected; skipping Waybar config."
+    return
+  fi
+
+  local waybar_pkg="waybar"
+  local waybar_pkg_target="$HOME/.config/waybar"
+
+  mkdir -p "$waybar_pkg_target"
+
+  if [[ "$MODE" != "unstow" ]]; then
+    # Back up any existing non-symlinked config files
+    local conf="$waybar_pkg_target/config.jsonc"
+    if [[ -e "$conf" && ! -L "$conf" ]]; then
+      local backup="${conf}.pre-stow.$(date +%Y%m%d-%H%M%S)"
+      log "Backing up existing $conf -> $backup"
+      mv "$conf" "$backup"
+    fi
+    local style="$waybar_pkg_target/style.css"
+    if [[ -e "$style" && ! -L "$style" ]]; then
+      local backup="${style}.pre-stow.$(date +%Y%m%d-%H%M%S)"
+      log "Backing up existing $style -> $backup"
+      mv "$style" "$backup"
+    fi
+  fi
+
+  case "$MODE" in
+    stow)
+      log "Stowing Waybar config → $waybar_pkg_target"
+      stow $STOW_FLAGS -t "$waybar_pkg_target" "$waybar_pkg"
+      ;;
+    restow)
+      log "Re-stowing Waybar config → $waybar_pkg_target"
+      stow $STOW_FLAGS -R -t "$waybar_pkg_target" "$waybar_pkg"
+      ;;
+    unstow)
+      log "Unstowing Waybar config ← $waybar_pkg_target"
+      stow $STOW_FLAGS -D -t "$waybar_pkg_target" "$waybar_pkg"
+      ;;
+  esac
+}
+
+stow_waybar_if_applicable
+
 if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
   log ""
   log "Verify symlinks (examples):"
