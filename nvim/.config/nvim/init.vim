@@ -26,7 +26,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
   Plug 'edkolev/tmuxline.vim'
-  Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npm install' }
+  Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
   Plug 'tpope/vim-fugitive'
   Plug 'airblade/vim-gitgutter'
   Plug 'skywind3000/asyncrun.vim'
@@ -144,6 +144,13 @@ nnoremap <silent> K :call CocAction('doHover')<CR>
 nmap <leader>rn <Plug>(coc-rename)
 xmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
+
+" =========================
+" MarkdownPreview
+" =========================
+let g:mkdp_filetypes = ['markdown']
+nnoremap <leader>mp :MarkdownPreviewToggle<CR>
+let g:mkdp_auto_close = 1
 
 " =========================
 " Treesitter (syntax & indent)
