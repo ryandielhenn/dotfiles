@@ -71,14 +71,18 @@ window#waybar > box > * {
 
 /* per-module accent borders */
 #pulseaudio  { border-color: alpha(@aqua, 0.35); }
-#network     { border-color: alpha(@muted, 0.35); }
-#battery     { border-color: alpha(@muted, 0.35); }
+#network     { border-color: alpha(@aqua, 0.35); }
+#battery     { border-color: alpha(@aqua, 0.35); }
 #clock       { border-color: alpha(@aqua, 0.35); }
 
 /* tray */
-#tray { padding-right: 8px; }
+#tray { 
+  padding-right: 8px; 
+  border-color: alpha(@aqua, 0.35);
+}
 #tray > .needs-attention {
   background: alpha(@red, 0.25);
+  border-color: alpha(@aqua, 0.35);
   border-radius: 10px;
 }
 
