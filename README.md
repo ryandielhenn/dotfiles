@@ -92,16 +92,3 @@ Use [Alacritty](https://github.com/alacritty/alacritty/tree/master) as default s
 ├── .zshrc -> .dotfiles/zsh/.zshrc
 ```
 
-```text
-➜  ~ tree -L 2 -f -l .config
-.config
-├── .config/../.dotfiles/alacritty/.config/alacritty -> ../.dotfiles/alacritty/.config/alacritty
-│   ├── .config/../.dotfiles/alacritty/.config/alacritty/alacritty.toml
-│   └── .config/../.dotfiles/alacritty/.config/alacritty/catppuccin-mocha.toml
-.
-.
-└── .config/../.dotfiles/nvim/.config/nvim -> ../.dotfiles/nvim/.config/nvim
-    ├── .config/../.dotfiles/nvim/.config/nvim/after
-    └── .config/../.dotfiles/nvim/.config/nvim/init.vim
-```
-
