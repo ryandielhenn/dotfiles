@@ -73,8 +73,6 @@ sudo apt install -y nodejs
 nvim +'PlugInstall --sync' +qa
 nvim +'CocInstall -sync coc-json coc-tsserver' +qa
 ```
-### Alacritty (Optional)
-Use [Alacritty](https://github.com/alacritty/alacritty/tree/master) as default shell.
 
 ### Verify symlinks
 ```text
