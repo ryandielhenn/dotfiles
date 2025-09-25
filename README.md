@@ -64,15 +64,23 @@ Examples:
 ```
 
 ### Vim Plug
+
+My init.vim has a bunch of plugins you need [`vim-plug`](https://github.com/junegunn/vim-plug) for.
 ```bash
 # --- Install vim-plug (plugin manager) ---
 curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 ```
 
+```bash
+# --- Install neovim plugins ---
+nvim +'PlugInstall --sync' +qa
+```
+
 ### Neovim + CoC Setup
 
-To get [`coc.nvim`](https://github.com/neoclide/coc.nvim) working properly, you need a recent version of Vim/Neovim, a plugin manager, and Node.js (used by CoC forlanguage servers).
+To get [`coc.nvim`](https://github.com/neoclide/coc.nvim) working properly, you need a recent version of Vim/Neovim, a plugin manager, and Node.js 
+(used by CoC for language servers).
 
 Optionally remove the plugin from init.vim deleting this line.
 
