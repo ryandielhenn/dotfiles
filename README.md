@@ -1,22 +1,22 @@
 # Dotfiles
 
-My personal configuration files for **Zsh**, **Neovim**, and **Git**.  
-Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything version-controlled and easy to set up on new machines.
+My personal configuration files.
+Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything easy to set up on new machines.
 
 ---
 
 ## Features
 
-- Keep configs in `~/.dotfiles`, `./bootstrap.sh` symlinks them back into `$HOME`
-- Clean separation: `zsh/`, `nvim/`, `git/`, `alacritty/`
+- Keep configs in `~/.dotfiles`, `python3 scripts/bootstrap.py` symlinks them back into `$HOME`
+- Clean separation: `zsh/`, `nvim/`, `git/`, `alacritty/`, etc.
 - Ignores runtime files like history and caches
-- Portable: works on macOS and Linux
+- Portable: works on macOS, Linux, Windows
 
 ---
 
 ## Prerequisites
 
-Just run `./bootstrap.sh` — it will install GNU Stow and Oh My Zsh if they’re missing.  
+Just run `python3 scripts/bootstrap.py` — it will install GNU Stow and Oh My Zsh if they’re missing.  
 On macOS, you need [Homebrew](https://brew.sh/) installed first.  
 On Linux, make sure you have `git` and a package manager that can install `stow`.
 
@@ -25,7 +25,7 @@ On Linux, make sure you have `git` and a package manager that can install `stow`
 ## Usage
 
 ```text
-Usage: ./bootstrap.sh [options]
+Usage: python3 scripts/bootstrap.py [options]
 
 Options:
   --dry-run        Show what would happen without making changes
@@ -46,33 +46,6 @@ Examples:
   ./bootstrap.sh --packages zsh git
       # Only stow zsh and git configs (skip nvim)
 ```
-### Neovim + CoC Setup (Linux)
-
-To get `coc.nvim` working properly, you need a recent version of Vim/Neovim, a plugin manager, and Node.js (used by CoC for language servers).
-
-```bash
-# --- Install latest Neovim ---
-sudo add-apt-repository ppa:neovim-ppa/unstable -y
-sudo apt update
-sudo apt install -y neovim
-
-# (Optional) Install a modern Vim as fallback
-sudo add-apt-repository ppa:jonathonf/vim -y
-sudo apt update
-sudo apt install -y vim
-
-# --- Install vim-plug (plugin manager) ---
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-# --- Install Node.js (LTS) ---
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# --- Install CoC plugins after starting nvim ---
-nvim +'PlugInstall --sync' +qa
-nvim +'CocInstall -sync coc-json coc-tsserver' +qa
-```
 
 ### Verify symlinks
 ```text
@@ -90,3 +63,17 @@ nvim +'CocInstall -sync coc-json coc-tsserver' +qa
 ├── .zshrc -> .dotfiles/zsh/.zshrc
 ```
 
+### Vim Plug
+```bash
+# --- Install vim-plug (plugin manager) ---
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+```
+
+### Neovim + CoC Setup
+
+To get [`coc.nvim`](https://github.com/neoclide/coc.nvim) working properly, you need a recent version of Vim/Neovim, a plugin manager, and Node.js (used by CoC forlanguage servers).
+
+Optionally remove the plugin from init.vim deleting this line.
+
+`Plug 'neoclide/coc.nvim', {'branch': 'release'}`
