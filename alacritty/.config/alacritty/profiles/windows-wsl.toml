@@ -1,5 +1,5 @@
 [general]
-import = ["alacritty.toml"]
+import = ["../base.toml"]
 
 [terminal.shell]
 program = "wsl.exe"
