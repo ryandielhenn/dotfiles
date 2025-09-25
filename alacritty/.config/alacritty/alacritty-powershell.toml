@@ -1,0 +1,9 @@
+[general]
+import = ["alacritty.toml"]
+
+working_directory = "C:/Users/Ryan Dielhenn"
+
+[terminal.shell]
+program = "powershell.exe"
+
+args = ["-NoLogo"]
