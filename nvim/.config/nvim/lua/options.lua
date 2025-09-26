@@ -1,0 +1,14 @@
+local o, wo = vim.o, vim.wo
+o.number = true
+o.tabstop = 4
+o.softtabstop = 4
+o.shiftwidth = 4
+o.expandtab = true
+o.hidden = true
+o.encoding = "utf-8"
+o.backup = false
+o.writebackup = false
+o.updatetime = 300
+o.shortmess = o.shortmess .. "c"
+wo.signcolumn = "yes"
+o.report = 0
