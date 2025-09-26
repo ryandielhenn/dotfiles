@@ -17,7 +17,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   { "sainnhe/everforest" },
   { "ojroques/nvim-osc52" },
-  { "junegunn/fzf", build = "./install --bin" }
+  { "junegunn/fzf", build = "./install --bin" },
   { "junegunn/fzf.vim" },
   { "neoclide/coc.nvim", branch = "release" },
   { "vim-airline/vim-airline" },
@@ -37,9 +37,6 @@ require("lazy").setup({
   },
   { "tpope/vim-vinegar" },
 }, {
-  ui = {
-    border = "rounded", -- nice rounded borders in the :Lazy UI
-  },
   install = {
     missing = true, -- auto-install any missing plugins on startup
   },
