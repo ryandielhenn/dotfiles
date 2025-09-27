@@ -1,8 +1,8 @@
 {
   "asyncrun.vim": { "branch": "master", "commit": "e17c49c67d1dd847cd1d7d6077a7168816f546cc" },
-  "coc.nvim": { "branch": "release", "commit": "c46915bad05bf340d6c0032731556808b6ef5104" },
+  "coc.nvim": { "branch": "release", "commit": "db6c23a19f7d39a2ba6f25c78d2e8ccd8e8db5ef" },
   "everforest": { "branch": "master", "commit": "3fffb096f6ac11372944ac964c60f8af41d8809f" },
-  "fzf": { "branch": "master", "commit": "3401c2e0c7c441c2a13c11e958f6b99efc50bd29" },
+  "fzf": { "branch": "master", "commit": "687074e77290f699199bce92c7541bbc2890a7cd" },
   "fzf.vim": { "branch": "master", "commit": "879db51d0965515cdaef9b7f6bdeb91c65d2829e" },
   "lazy.nvim": { "branch": "main", "commit": "6c3bda4aca61a13a9c63f1c1d1b16b9d3be90d7a" },
   "markdown-preview.nvim": { "branch": "master", "commit": "a923f5fc5ba36a3b17e289dc35dc17f66d0548ee" },

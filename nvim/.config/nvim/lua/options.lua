@@ -12,3 +12,7 @@ o.updatetime = 300
 o.shortmess = o.shortmess .. "c"
 wo.signcolumn = "yes"
 o.report = 0
+vim.g.airline_powerline_fonts = 1
+vim.g["airline#extensions#tabline#enabled"] = 1
+vim.g.airline_theme = "everforest"
+vim.g.airline_section_c = "%{coc#status()}"

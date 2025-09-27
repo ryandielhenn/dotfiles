@@ -1,8 +1,6 @@
--- set leader ASAP
 vim.g.mapleader = " "
 vim.g.editorconfig = false
 
--- load modules
 require("options")
 require("plugins")
 require("ui")
