@@ -56,7 +56,7 @@ map("n", "<leader>rn", "<Plug>(coc-rename)", { noremap = false })
 map("x", "<leader>f", "<Plug>(coc-format-selected)", { noremap = false })
 map("n", "<leader>f", "<Plug>(coc-format-selected)", { noremap = false })
 
--- MarkdownPreview bits (kept here since you hit them with Coc often)
+-- MarkdownPreview bits
 vim.g.mkdp_filetypes = { "markdown" }
 vim.g.mkdp_auto_close = 1
 map("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")

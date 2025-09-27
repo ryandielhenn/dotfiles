@@ -20,8 +20,20 @@ require("lazy").setup({
   { "junegunn/fzf", build = "./install --bin" },
   { "junegunn/fzf.vim" },
   { "neoclide/coc.nvim", branch = "release" },
-  { "vim-airline/vim-airline" },
-  { "vim-airline/vim-airline-themes" },
+  {
+    "vim-airline/vim-airline",
+    dependencies = { "vim-airline/vim-airline-themes" },
+    init = function()
+      vim.g.airline_powerline_fonts = 1
+      vim.g["airline#extensions#tabline#enabled"] = 1
+      vim.g.airline_theme = "everforest"
+      vim.g["airline#extensions#coc#enabled"] = 1
+      vim.g.airline_section_c = [[%{coc#status()}]]
+
+      vim.opt.laststatus = 2
+      vim.opt.showtabline = 2
+    end,
+  },
   { "edkolev/tmuxline.vim" },
   {
     "iamcco/markdown-preview.nvim",
