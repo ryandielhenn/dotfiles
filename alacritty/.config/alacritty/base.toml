@@ -1,6 +1,6 @@
 [window]
 decorations = "none"
-opacity = 0.9
+opacity = 1
 
 [selection]
 save_to_clipboard = true
