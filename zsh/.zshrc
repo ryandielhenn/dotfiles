@@ -45,14 +45,6 @@ fi
 
 source "$ZSH/oh-my-zsh.sh"
 
-# ---------- Completion and fzf ------------------ #
-# fzf for Ctrl+R fuzzy history search
-source /usr/share/fzf/key-bindings.zsh
-source /usr/share/fzf/completion.zsh
-
-# zsh-autosuggestions for ghost text
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-
 # ---------- fzf (with ripgrep fallback) ----------
 if command -v rg >/dev/null 2>&1; then
   export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
