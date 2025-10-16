@@ -13,7 +13,3 @@ alias ksformat="bin/kafka-storage.sh format"
 alias kbstart="bin/kafka-server-start.sh config/kraft/broker.properties"
 alias kcstart="bin/kafka-server-start.sh config/kraft/controller.properties"
 alias kconfig="bin/kafka-configs.sh --bootstrap-server localhost:9092"
-
-alias dash='neofetch; for cmd in "htop" "btop"; do alacritty -e bash -c "$cmd; exec bash" & sleep 0.2; done'
-
-alias dmux='tmux new-session bash -c "neofetch; exec zsh"'
