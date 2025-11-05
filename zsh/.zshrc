@@ -3,11 +3,6 @@ export EDITOR="nvim"
 export VISUAL="$EDITOR"
 export PAGER="less"
 
-# Tell tools like neofetch which terminal you're using
-if [[ -n "$ALACRITTY_WINDOW_ID" ]]; then
-  export TERM_PROGRAM=alacritty
-fi
-
 # Prefer UTF-8 (uncomment if you want these globally)
 # export LANG="en_US.UTF-8"
 # export LC_ALL="en_US.UTF-8"

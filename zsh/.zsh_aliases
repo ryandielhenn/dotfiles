@@ -1,6 +1,12 @@
 # neovim > vim
 alias vim="nvim"
 
+if command -v xdg-open &> /dev/null; then
+    open() {
+        xdg-open "$@" &> /dev/null & disown
+    }
+fi
+
 # Update trunk/master with upstream fork
 alias update="git checkout master && git fetch --tags -f upstream &&
 git rebase upstream/master && git push origin HEAD:master"
