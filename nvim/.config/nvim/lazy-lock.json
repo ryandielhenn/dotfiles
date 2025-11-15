@@ -1,10 +1,9 @@
 {
   "asyncrun.vim": { "branch": "master", "commit": "e17c49c67d1dd847cd1d7d6077a7168816f546cc" },
-  "coc.nvim": { "branch": "release", "commit": "2af9b441cb55ec4e2c54dace3f5fa8d581f2c884" },
-  "everforest": { "branch": "master", "commit": "46b297d07b1ae9a58398abc5ee1877f7cae4b644" },
-  "fzf": { "branch": "master", "commit": "4d563c6dfaf854260314cb5cdc9df577ec512805" },
+  "coc.nvim": { "branch": "release", "commit": "3b0b28802a1b55d0dab1a440a6e1d3b37d3af968" },
+  "everforest": { "branch": "master", "commit": "484dd560dccb2d2842685c441ad2b54a54ffef1b" },
+  "fzf": { "branch": "master", "commit": "60b35e748be4da4e3761f30081afd347d05928a0" },
   "fzf.vim": { "branch": "master", "commit": "879db51d0965515cdaef9b7f6bdeb91c65d2829e" },
-  "hererocks": { "branch": "master", "commit": "160228946bed9998f5e3b168bd0b66ba2690f8f3" },
   "image.nvim": { "branch": "master", "commit": "446a8a5cc7a3eae3185ee0c697732c32a5547a0b" },
   "jupytext.nvim": { "branch": "main", "commit": "c8baf3ad344c59b3abd461ecc17fc16ec44d0f7b" },
   "lazy.nvim": { "branch": "main", "commit": "85c7ff3711b730b4030d03144f6db6375044ae82" },
