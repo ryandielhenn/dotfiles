@@ -5,12 +5,14 @@ local function copy(lines, regtype)
   local text = table.concat(lines, "\n")
   
   if os.getenv("TMUX") then
-    -- Use system clipboard command based on OS
     if vim.fn.has("mac") == 1 then
       vim.fn.system("pbcopy", text)
     elseif vim.fn.has("unix") == 1 then
-      -- Try wl-copy (Wayland) first, then xclip (X11)
-      if vim.fn.executable("wl-copy") == 1 then
+      -- Check session type first
+      local session_type = os.getenv("XDG_SESSION_TYPE")
+      local wayland_display = os.getenv("WAYLAND_DISPLAY")
+      
+      if (session_type == "wayland" or wayland_display) and vim.fn.executable("wl-copy") == 1 then
         vim.fn.system("wl-copy", text)
       elseif vim.fn.executable("xclip") == 1 then
         vim.fn.system("xclip -selection clipboard", text)
@@ -20,7 +22,6 @@ local function copy(lines, regtype)
     end
   end
   
-  -- Still try OSC 52 (works over SSH)
   osc52.copy(text)
 end
 
@@ -30,7 +31,10 @@ local function paste()
     if vim.fn.has("mac") == 1 then
       output = vim.fn.system("pbpaste")
     elseif vim.fn.has("unix") == 1 then
-      if vim.fn.executable("wl-paste") == 1 then
+      local session_type = os.getenv("XDG_SESSION_TYPE")
+      local wayland_display = os.getenv("WAYLAND_DISPLAY")
+      
+      if (session_type == "wayland" or wayland_display) and vim.fn.executable("wl-paste") == 1 then
         output = vim.fn.system("wl-paste --no-newline")
       elseif vim.fn.executable("xclip") == 1 then
         output = vim.fn.system("xclip -selection clipboard -o")
