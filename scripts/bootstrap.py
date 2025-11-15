@@ -11,7 +11,7 @@ from pathlib import Path
 # -------------------------------
 # Defaults (same spirit as bash)
 # -------------------------------
-DEFAULT_PACKAGES = ["zsh", "nvim", "git", "alacritty"]
+DEFAULT_PACKAGES = ["zsh", "nvim", "git", "alacritty", "kitty", "tmux"]
 TARGET = Path.home()  # package trees like ".config/alacritty" expect $HOME as -t
 
 # -------------------------------
@@ -291,6 +291,8 @@ def main():
         for f in [
             "~/.zshrc",
             "~/.gitconfig",
+            "~/.tmux.conf",
+            "~/.config/kitty"
             "~/.config/nvim",
             "~/.config/alacritty",
             "~/.config/hypr",
