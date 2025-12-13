@@ -7,7 +7,7 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything e
 
 ## Features
 
-- Keep configs in `~/.dotfiles`, `python3 scripts/bootstrap.py` symlinks them back into `$HOME`
+- Keep configs in `~/.dotfiles`, `./bootstrap.sh` symlinks them back into `$HOME`
 - Clean separation: `zsh/`, `nvim/`, `git/`, `alacritty/`, etc.
 - Ignores runtime files like history and caches
 - Portable: works on macOS, Linux, Windows
@@ -16,7 +16,7 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything e
 
 ## Prerequisites
 
-Just run `python3 scripts/bootstrap.py` — it will install GNU Stow and Oh My Zsh if they’re missing.  
+Just run `./bootstrap.sh` — it will install GNU Stow and Oh My Zsh if they’re missing.  
 On macOS, you need [Homebrew](https://brew.sh/) installed first.  
 On Linux, make sure you have `git` and a package manager that can install `stow`.
 
@@ -25,7 +25,7 @@ On Linux, make sure you have `git` and a package manager that can install `stow`
 ## Usage
 
 ```text
-Usage: python3 scripts/bootstrap.py [options]
+Usage: ./bootstrap.sh [options]
 
 Options:
   --dry-run        Show what would happen without making changes
@@ -63,19 +63,10 @@ Examples:
 ├── .zshrc -> .dotfiles/zsh/.zshrc
 ```
 
-### Vim Plug
+### LazyVim
 
-My init.vim has a bunch of plugins you need [`vim-plug`](https://github.com/junegunn/vim-plug) for.
-```bash
-# --- Install vim-plug (plugin manager) ---
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-```
-
-```bash
-# --- Install neovim plugins ---
-nvim +'PlugInstall --sync' +qa
-```
+My init.vim has a bunch of plugins you need [`LazyVim`](https://www.lazyvim.org) for.
+`lazy.nvim` will bootstrap when nvim is opened for the first time.
 
 ### Neovim + CoC Setup
 
