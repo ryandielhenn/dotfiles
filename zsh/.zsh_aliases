@@ -8,8 +8,8 @@ if command -v xdg-open &> /dev/null; then
 fi
 
 # Update trunk/master with upstream fork
-alias update="git checkout master && git fetch --tags -f upstream &&
-git rebase upstream/master && git push origin HEAD:master"
+alias update="git checkout main && git fetch --tags -f upstream &&
+git rebase upstream/main && git push origin HEAD:main"
 alias updatet="git checkout trunk && git fetch --tags -f upstream &&
 git rebase upstream/trunk && git push origin HEAD:trunk"
 
