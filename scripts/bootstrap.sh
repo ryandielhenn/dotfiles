@@ -4,7 +4,7 @@ set -euo pipefail
 # --------------------------------------------
 # Config
 # --------------------------------------------
-PACKAGES=("zsh" "nvim" "git" "alacritty")   # stow these subfolders
+PACKAGES=("zsh" "nvim" "git" "alacritty" "kitty")   # stow these subfolders
 TARGET="$HOME"                  # where to symlink to
 DRY_RUN=0                       # set via --dry-run
 NO_OMZ=0                        # set via --no-ohmyzsh
@@ -250,44 +250,6 @@ case "$MODE" in
     ;;
 esac
 
-stow_hypr_if_applicable() {
-  if [[ "$(uname -s)" != "Linux" ]] || ! have hyprctl; then
-    log "Hyprland not detected; skipping Hypr config."
-    return
-  fi
-  [[ -d "hypr/.config/hypr" ]] || { log "Expected 'hypr/.config/hypr'."; return; }
-
-  # parent only; do NOT mkdir ~/.config/hypr (we want a dir symlink there)
-  mkdir -p "$HOME/.config"
-  [[ "$MODE" != "unstow" ]] && backup_conflicts_for_pkg hypr
-
-  case "$MODE" in
-    stow)   log "Stowing Hyprland → $TARGET"; stow $STOW_FLAGS -t "$TARGET" hypr ;;
-    restow) log "Re-stowing Hyprland → $TARGET"; stow $STOW_FLAGS -R -t "$TARGET" hypr ;;
-    unstow) log "Unstowing Hyprland ← $TARGET"; stow $STOW_FLAGS -D -t "$TARGET" hypr ;;
-  esac
-}
-
-stow_waybar_if_applicable() {
-  if [[ "$(uname -s)" != "Linux" ]] || ! have waybar; then
-    log "Waybar not detected; skipping Waybar config."
-    return
-  fi
-  [[ -d "waybar/.config/waybar" ]] || { log "Expected 'waybar/.config/waybar'."; return; }
-
-  mkdir -p "$HOME/.config"
-  [[ "$MODE" != "unstow" ]] && backup_conflicts_for_pkg waybar
-
-  case "$MODE" in
-    stow)   log "Stowing Waybar → $TARGET"; stow $STOW_FLAGS -t "$TARGET" waybar ;;
-    restow) log "Re-stowing Waybar → $TARGET"; stow $STOW_FLAGS -R -t "$TARGET" waybar ;;
-    unstow) log "Unstowing Waybar ← $TARGET"; stow $STOW_FLAGS -D -t "$TARGET" waybar ;;
-  esac
-}
-
-stow_hypr_if_applicable
-stow_waybar_if_applicable
-
 if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
   log ""
   log "Verify symlinks (examples):"
@@ -295,8 +257,7 @@ if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
         "$HOME/.gitconfig" \
         "$HOME/.config/nvim" \
         "$HOME/.config/alacritty" \
-        "$HOME/.config/hypr" \
-        "$HOME/.config/waybar"
+        "$HOME/.config/kitty"
     do
     [ -e "$f" ] && ls -l "$f" || true
   done

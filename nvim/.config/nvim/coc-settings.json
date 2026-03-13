@@ -1,9 +1,0 @@
-{
-  "workspace.ignoredFolders": [
-    "$HOME",
-    "$HOME/.cargo/**",
-    "$HOME/.rustup/**"
-  ],
-  "rust-analyzer.check.command": "clippy",
-  "coc.preferences.formatOnSave": true
-}

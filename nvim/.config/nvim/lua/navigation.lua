@@ -13,3 +13,9 @@ map("n", "<leader>fg", ":Rg ")
 map("n", "<leader>fb", ":Buffers<CR>")
 map("n", "<leader>fe", ":Lexplore<CR>")
 map("n", "gf", ":GFiles<CR>")
+
+-- MarkdownPreview bits
+vim.g.mkdp_filetypes = { "markdown" }
+vim.g.mkdp_auto_close = 1
+map("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
+

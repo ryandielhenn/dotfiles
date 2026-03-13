@@ -19,16 +19,36 @@ require("lazy").setup({
   { "ojroques/nvim-osc52" },
   { "junegunn/fzf", build = "./install --bin" },
   { "junegunn/fzf.vim" },
-  { "neoclide/coc.nvim", branch = "release" },
+  { "neovim/nvim-lspconfig" },
+  { "stevearc/conform.nvim" },
+  {
+    "mason-org/mason.nvim",
+    opts = {}
+  },
+  { "williamboman/mason-lspconfig.nvim" },
+  { "mfussenegger/nvim-jdtls"},
+  {
+    'saghen/blink.cmp',
+    version = '*',
+    opts = {
+      keymap = { 
+        preset = 'default',
+        ['<CR>'] = { 'accept', 'fallback' },
+        ['<Tab>'] = { 'accept', 'fallback' },
+      },
+      appearance = { nerd_font_variant = 'mono' },
+      completion = { documentation = { auto_show = true } },
+      sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } },
+    },
+  },
   {
     "vim-airline/vim-airline",
     dependencies = { "vim-airline/vim-airline-themes" },
     init = function()
       vim.g.airline_powerline_fonts = 1
       vim.g["airline#extensions#tabline#enabled"] = 1
+      vim.g["airline#extensions#nvimlsp#enabled"] = 1
       vim.g.airline_theme = "everforest"
-      vim.g["airline#extensions#coc#enabled"] = 1
-      vim.g.airline_section_c = [[%{coc#status()}]]
       vim.opt.laststatus = 2
       vim.opt.showtabline = 2
     end,
