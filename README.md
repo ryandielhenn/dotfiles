@@ -1,16 +1,10 @@
 # Dotfiles
 
-My personal configuration files.
 Managed with [GNU Stow](https://www.gnu.org/software/stow/) to keep everything easy to set up on new machines.
 
 ---
 
-## Features
-
 - Keep configs in `~/.dotfiles`, `./bootstrap.sh` symlinks them back into `$HOME`
-- Clean separation: `zsh/`, `nvim/`, `git/`, `alacritty/`, etc.
-- Ignores runtime files like history and caches
-- Portable: works on macOS, Linux, Windows
 
 ---
 
@@ -45,22 +39,6 @@ Examples:
 
   ./bootstrap.sh --packages zsh git
       # Only stow zsh and git configs (skip nvim)
-```
-
-### Verify symlinks
-```text
-➜  ~ tree -a -P ".*" -L 1 ~
-/Users/dielhennr
-.
-.
-├── .gitconfig -> .dotfiles/git/.gitconfig
-.
-.
-├── .zprofile -> .dotfiles/zsh/.zprofile
-├── .zsh_aliases -> .dotfiles/zsh/.zsh_aliases
-.
-.
-├── .zshrc -> .dotfiles/zsh/.zshrc
 ```
 
 ### LazyVim
