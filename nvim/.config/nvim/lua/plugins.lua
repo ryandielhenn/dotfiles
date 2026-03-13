@@ -16,17 +16,32 @@ vim.opt.rtp:prepend(lazypath)
 -- Plugin setup
 require("lazy").setup({
   { "sainnhe/everforest" },
+  { "tpope/vim-vinegar" },
   { "ojroques/nvim-osc52" },
-  { "junegunn/fzf",         build = "./install --bin" },
+  { "junegunn/fzf",                     build = "./install --bin" },
   { "junegunn/fzf.vim" },
   { "neovim/nvim-lspconfig" },
   { "stevearc/conform.nvim" },
+  { "williamboman/mason-lspconfig.nvim" },
+  { "mfussenegger/nvim-jdtls" },
+  { 'wakatime/vim-wakatime',            lazy = false },
+  { "edkolev/tmuxline.vim" },
+  { "tpope/vim-fugitive" },
+  { "airblade/vim-gitgutter" },
+  { "skywind3000/asyncrun.vim" },
   {
     "mason-org/mason.nvim",
     opts = {}
   },
-  { "williamboman/mason-lspconfig.nvim" },
-  { "mfussenegger/nvim-jdtls" },
+  {
+    "iamcco/markdown-preview.nvim",
+    build = "cd app && npx --yes yarn install",
+    ft = { "markdown" }, -- lazy-load only for markdown files
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+  },
   {
     'saghen/blink.cmp',
     version = '*',
@@ -53,21 +68,6 @@ require("lazy").setup({
       vim.opt.showtabline = 2
     end,
   },
-  { 'wakatime/vim-wakatime', lazy = false },
-  { "edkolev/tmuxline.vim" },
-  {
-    "iamcco/markdown-preview.nvim",
-    build = "cd app && npx --yes yarn install",
-    ft = { "markdown" }, -- lazy-load only for markdown files
-  },
-  { "tpope/vim-fugitive" },
-  { "airblade/vim-gitgutter" },
-  { "skywind3000/asyncrun.vim" },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-  },
-  { "tpope/vim-vinegar" },
   install = {
     missing = true, -- auto-install any missing plugins on startup
   },
