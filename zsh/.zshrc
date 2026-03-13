@@ -66,38 +66,5 @@ if command -v go >/dev/null 2>&1; then
 fi
 # ---------- end Go toolchain ----------
 
-# ---------------------------------------------------------
-# Wofi Toggle Function
-# - Launches Wofi with custom config + style if not running
-# - If Wofi is already running, kills it (toggle behavior)
-# - Install 
-#
-# TODO update bootstrap.sh
-# - cd ~.config
-# - clone repo at https://github.com/quantumfate/wofi
-# ---------------------------------------------------------
-# --- wofi paths (edit these once) ---
-WOFI_CONF="$HOME/.config/wofi/config/config"
-WOFI_STYLE="$HOME/.config/wofi/src/everforest/style.css"
-
-# Helper to always call wofi with the same styling
-wofi_cmd() {
-  wofi --conf "$WOFI_CONF" --style "$WOFI_STYLE" "$@"
-}
-
-wofi-toggle() {
-  # Only run on Linux + Wayland and if wofi exists
-  [[ "$OSTYPE" == "linux-gnu"* ]] || return 0
-  [[ -n "$WAYLAND_DISPLAY" ]] || return 0
-  command -v wofi >/dev/null 2>&1 || return 0
-
-  if ! pidof wofi >/dev/null 2>&1; then
-    # Same style as dmenu prompts
-    wofi_cmd
-  else
-    pkill -x wofi
-  fi
-}
-
 [ -d "$HOME/.local/bin" ] && export PATH="$PATH:$HOME/.local/bin"
 [ -d "$HOME/.spicetify" ] && export PATH="$PATH:$HOME/.spicetify"
