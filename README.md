@@ -67,12 +67,3 @@ Examples:
 
 My init.vim has a bunch of plugins you need [`LazyVim`](https://www.lazyvim.org) for.
 `lazy.nvim` will bootstrap when nvim is opened for the first time.
-
-### Neovim + CoC Setup
-
-To get [`coc.nvim`](https://github.com/neoclide/coc.nvim) working properly, you need a recent version of Vim/Neovim, a plugin manager, and Node.js 
-(used by CoC for language servers).
-
-Optionally remove the plugin from init.vim deleting this line.
-
-`Plug 'neoclide/coc.nvim', {'branch': 'release'}`
