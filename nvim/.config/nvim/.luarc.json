@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/lua-language-server/main/meta/EmmyLua.json",
+  "workspace": {
+    "library": [
+      "$VIMRUNTIME/lua",
+      "${3rd}/luv/library"
+    ],
+    "checkThirdParty": false
+  },
+  "runtime": {
+    "version": "LuaJIT"
+  }
+}

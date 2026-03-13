@@ -2,7 +2,7 @@
 
 -- Bootstrap lazy.nvim if not installed
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -17,7 +17,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   { "sainnhe/everforest" },
   { "ojroques/nvim-osc52" },
-  { "junegunn/fzf", build = "./install --bin" },
+  { "junegunn/fzf",         build = "./install --bin" },
   { "junegunn/fzf.vim" },
   { "neovim/nvim-lspconfig" },
   { "stevearc/conform.nvim" },
@@ -26,12 +26,12 @@ require("lazy").setup({
     opts = {}
   },
   { "williamboman/mason-lspconfig.nvim" },
-  { "mfussenegger/nvim-jdtls"},
+  { "mfussenegger/nvim-jdtls" },
   {
     'saghen/blink.cmp',
     version = '*',
     opts = {
-      keymap = { 
+      keymap = {
         preset = 'default',
         ['<CR>'] = { 'accept', 'fallback' },
         ['<Tab>'] = { 'accept', 'fallback' },
@@ -72,8 +72,8 @@ require("lazy").setup({
     missing = true, -- auto-install any missing plugins on startup
   },
   checker = {
-    enabled = true,  -- auto-check for plugin updates
-    notify = false,  -- don't spam with notifications
+    enabled = true, -- auto-check for plugin updates
+    notify = false, -- don't spam with notifications
   },
   rocks = {
     enabled = true,

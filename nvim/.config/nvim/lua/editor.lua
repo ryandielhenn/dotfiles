@@ -1,39 +1,41 @@
 local o, wo = vim.o, vim.wo
-o.number = true
-o.tabstop = 4
-o.softtabstop = 4
-o.shiftwidth = 4
-o.expandtab = true
-o.hidden = true
+o.number = true                  -- show line numbers
+o.tabstop = 4                    -- tab character displays as 4 spaces
+o.softtabstop = 4                -- tab key moves 4 spaces in insert mode
+o.shiftwidth = 4                 -- >> and << indent by 4 spaces
+o.expandtab = true               -- pressing tab inserts spaces, not a tab character
+o.hidden = true                  -- lets you switch buffers without saving first
 o.encoding = "utf-8"
-o.backup = false
-o.writebackup = false
-o.updatetime = 300
-o.shortmess = o.shortmess .. "c"
-wo.signcolumn = "yes"
-o.report = 0
-vim.g.netrw_banner = 0
-vim.g.netrw_liststyle = 3
-vim.g.netrw_browse_split = 0
-vim.g.netrw_winsize = 25
+o.updatetime = 300               -- ms before CursorHold fires, affects LSP responsiveness
 
+o.shortmess = o.shortmess .. "c" -- suppresses "match 1 of 2" completion menu messages
+wo.signcolumn = "yes"            -- always show the gutter column (stops layout shifting when diagnostics appear)
+o.report = 0                     -- always report number of lines changed (default only reports if > 2)vim.g.netrw_banner = 0
+
+vim.g.netrw_browse_split = 0     -- open files in same window
+vim.g.netrw_winsize = 25         -- explorer takes 25% of width
+
+-- Keymap helper
 local map = function(m, l, r, o)
   o = vim.tbl_extend("force", { silent = true, noremap = true }, o or {})
   vim.keymap.set(m, l, r, o)
 end
 
-map("n", "<leader>ff", ":Files<CR>")
-map("n", "<leader>fg", ":Rg ")
-map("n", "<leader>fb", ":Buffers<CR>")
-map("n", "<leader>fe", ":Lexplore<CR>")
-map("n", "gf", ":GFiles<CR>")
-map("n", "gb", ":Git blame<CR>")
-map("n", "bn", ":bn<CR>")
-map("n", "bp", ":bp<CR>")
+-- Keymappings
+map("n", "<leader>ff", ":Files<CR>")    -- fuzzy file find
+map("n", "<leader>fg", ":Rg ")          -- ripgrep inside vim
+map("n", "<leader>fb", ":Buffers<CR>")  --
+map("n", "<leader>fe", ":Lexplore<CR>") -- file explorer
+map("n", "gf", ":GFiles<CR>")           -- fuzzy find files tracked by git
+map("n", "gb", ":Git blame<CR>")        -- git blame
+map("n", "bn", ":bn<CR>")               -- next buffer
+map("n", "bp", ":bp<CR>")               -- previous buffer
 
+-- Colorscheme
 vim.o.termguicolors = true
 pcall(vim.cmd.colorscheme, "everforest")
 
+-- Treesitter config
 pcall(function()
   require("nvim-treesitter.configs").setup({
     highlight = { enable = true },
@@ -41,7 +43,7 @@ pcall(function()
   })
 end)
 
--- MarkdownPreview bits
+-- MarkdownPreview
 vim.g.mkdp_filetypes = { "markdown" }
 vim.g.mkdp_auto_close = 1
 map("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
@@ -55,9 +57,11 @@ require("conform").setup({
     java = { "google-java-format" },
     python = { "black" },
     c = { "clang_format" },
+    lua = { "stylua" },
   },
 })
 
+-- FZF config
 vim.g.fzf_layout = { down = "40%" }
 vim.api.nvim_create_user_command("Rg", function(opts)
   local query = table.concat(opts.fargs, " ")
