@@ -21,15 +21,18 @@ local map = function(m, l, r, o)
   vim.keymap.set(m, l, r, o)
 end
 
--- Keymappings
-map("n", "<leader>ff", ":Files<CR>")    -- fuzzy file find
-map("n", "<leader>fg", ":Rg ")          -- ripgrep inside vim
-map("n", "<leader>fb", ":Buffers<CR>")  --
-map("n", "<leader>fe", ":Lexplore<CR>") -- file explorer
-map("n", "gf", ":GFiles<CR>")           -- fuzzy find files tracked by git
-map("n", "gb", ":Git blame<CR>")        -- git blame
-map("n", "bn", ":bn<CR>")               -- next buffer
-map("n", "bp", ":bp<CR>")               -- previous buffer
+-- Leader Keymappings
+map("n", "<leader>ff", ":Files<CR>")      -- fuzzy file find
+map("n", "<leader>rg", ":Rg ")            -- ripgrep inside vim
+map("n", "<leader>fb", ":Buffers<CR>")    --
+map("n", "<leader>fe", ":Lexplore<CR>")   -- file explorer
+map("n", "<leader>gd", ":Gdiffsplit<CR>") -- file explorer
+
+-- non-Leader Keymappings
+map("n", "gf", ":GFiles<CR>")    -- fuzzy find files tracked by git
+map("n", "gb", ":Git blame<CR>") -- git blame
+map("n", "bn", ":bn<CR>")        -- next buffer
+map("n", "bp", ":bp<CR>")        -- previous buffer
 
 -- Colorscheme
 vim.o.termguicolors = true
