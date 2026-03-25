@@ -3,6 +3,6 @@ vim.g.editorconfig = false
 
 require("plugins")
 require("editor")
-require("autocmds")
+require("lsp")
 require("clipboard")
 require("notebooks")

@@ -1,5 +1,21 @@
+require("mason-lspconfig").setup({
+  automatic_enable = true
+})
+
+-- LSP configs
+vim.lsp.config("rust_analyzer", {
+  settings = {
+    ["rust-analyzer"] = {
+      cargo = {
+        allFeatures = true,
+        loadOutDirsFromCheck = true,
+        runBuildScripts = true,
+      },
+    }
+  }
+})
+
 -- LSP commands
-require("mason-lspconfig").setup({ automatic_enable = true })
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local buf = args.buf
@@ -10,6 +26,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end
 })
 
+-- Diagnostics
 vim.diagnostic.config({
   float = { border = "rounded" },
 })
