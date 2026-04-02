@@ -19,3 +19,6 @@ alias ksformat="bin/kafka-storage.sh format"
 alias kbstart="bin/kafka-server-start.sh config/kraft/broker.properties"
 alias kcstart="bin/kafka-server-start.sh config/kraft/controller.properties"
 alias kconfig="bin/kafka-configs.sh --bootstrap-server localhost:9092"
+
+# bluetooth
+alias buds='bluetoothctl connect B4:23:A2:0B:0E:9F && sleep 3 && pactl set-default-sink "bluez_output.B4:23:A2:0B:0E:9F"'
