@@ -23,7 +23,8 @@ end
 
 -- Leader Keymappings
 map("n", "<leader>ff", ":Files<CR>")      -- fuzzy file find
-map("n", "<leader>rg", ":Rg ")            -- ripgrep inside vim
+map("n", "<leader>ll", ":Lazy<CR>")       -- replace all
+map("n", "<leader>ma", ":Mason<CR>")      -- replace all
 map("n", "<leader>fb", ":Buffers<CR>")    --
 map("n", "<leader>fe", ":Lexplore<CR>")   -- file explorer
 map("n", "<leader>gd", ":Gdiffsplit<CR>") -- file explorer
