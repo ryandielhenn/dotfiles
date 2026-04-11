@@ -27,6 +27,7 @@ map("n", "<leader>rg", ":Rg ")            -- ripgrep inside vim
 map("n", "<leader>fb", ":Buffers<CR>")    --
 map("n", "<leader>fe", ":Lexplore<CR>")   -- file explorer
 map("n", "<leader>gd", ":Gdiffsplit<CR>") -- file explorer
+map("n", "<leader>ra", ":%s/")            -- replace all
 
 -- non-Leader Keymappings
 map("n", "gf", ":GFiles<CR>")    -- fuzzy find files tracked by git
