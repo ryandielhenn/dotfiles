@@ -4,7 +4,7 @@ set -euo pipefail
 # --------------------------------------------
 # Config
 # --------------------------------------------
-PACKAGES=("zsh" "nvim" "git" "alacritty" "kitty")   # stow these subfolders
+PACKAGES=("zsh" "nvim" "git" "kitty" "tmux")   # stow these subfolders
 TARGET="$HOME"                  # where to symlink to
 DRY_RUN=0                       # set via --dry-run
 NO_OMZ=0                        # set via --no-ohmyzsh
@@ -254,9 +254,9 @@ if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
   log ""
   log "Verify symlinks (examples):"
   for f in "$HOME/.zshrc" \
+        "$HOME/.tmux.conf" \
         "$HOME/.gitconfig" \
         "$HOME/.config/nvim" \
-        "$HOME/.config/alacritty" \
         "$HOME/.config/kitty"
     do
     [ -e "$f" ] && ls -l "$f" || true
