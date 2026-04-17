@@ -7,6 +7,8 @@ return {
   { "ojroques/nvim-osc52" },
   { "junegunn/fzf",                     build = "./install --bin" },
   { "junegunn/fzf.vim" },
+  { "nvim-treesitter/nvim-treesitter",  build = ":TSUpdate" },
+  { "mason-org/mason.nvim",             opts = {} },
   { "neovim/nvim-lspconfig" },
   { "stevearc/conform.nvim" },
   { "williamboman/mason-lspconfig.nvim" },

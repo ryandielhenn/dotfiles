@@ -21,4 +21,4 @@ alias kcstart="bin/kafka-server-start.sh config/kraft/controller.properties"
 alias kconfig="bin/kafka-configs.sh --bootstrap-server localhost:9092"
 
 # bluetooth
-alias buds='bluetoothctl connect B4:23:A2:0B:0E:9F && sleep 3 && pactl set-default-sink "bluez_output.B4:23:A2:0B:0E:9F"'
+alias buds='bluetoothctl connect B4:23:A2:0B:0E:9F && sleep 3 && pactl set-default-sink "bluez_output.B4_23_A2_0B_0E_9F.1"'
