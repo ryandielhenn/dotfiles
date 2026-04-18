@@ -16,5 +16,4 @@ return {
   { "edkolev/tmuxline.vim" },
   { "tpope/vim-fugitive" },
   { "airblade/vim-gitgutter" },
-  { "skywind3000/asyncrun.vim" },
 }
