@@ -11,10 +11,9 @@ return {
   { "neovim/nvim-lspconfig" },
   { "stevearc/conform.nvim" },
   { "williamboman/mason-lspconfig.nvim" },
-  { "mfussenegger/nvim-jdtls" },
+  { "mfussenegger/nvim-jdtls",          ft = { "java" } },
   { 'wakatime/vim-wakatime',            lazy = false },
   { "edkolev/tmuxline.vim" },
   { "tpope/vim-fugitive" },
   { "airblade/vim-gitgutter" },
-  { "skywind3000/asyncrun.vim" },
 }
