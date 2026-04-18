@@ -1,7 +1,5 @@
 vim.g.mapleader = " "
-vim.g.editorconfig = false
 
--- Bootstrap lazy.nvim if not installed
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
@@ -31,5 +29,4 @@ require("lazy").setup("plugins", {
 require("plugins")
 require("editor")
 require("lsp")
-require("clipboard")
 require("notebooks")

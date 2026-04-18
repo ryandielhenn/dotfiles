@@ -1,3 +1,17 @@
+vim.g.editorconfig = false
+vim.g.clipboard = {
+  name  = "osc52",
+  copy  = {
+    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").copy("*")
+  },
+  paste = {
+    ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").paste("+")
+  },
+}
+vim.o.clipboard = "unnamedplus"
+
 local o, wo = vim.o, vim.wo
 o.number = true                  -- show line numbers
 o.tabstop = 4                    -- tab character displays as 4 spaces
