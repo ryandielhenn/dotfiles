@@ -3,7 +3,7 @@ alias vim="nvim"
 
 if command -v xdg-open &> /dev/null; then
     open() {
-        xdg-open "$@" &> /dev/null & disown
+        nohup xdg-open "$1" > /dev/null 2>&1 &!
     }
 fi
 
