@@ -64,7 +64,7 @@ done
 # --------------------------------------------
 # Ensure we are in repo root
 # --------------------------------------------
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 # --------------------------------------------
 # Install prerequisites
@@ -183,11 +183,6 @@ maybe_chsh() {
     return
   fi
 
-  # WSL note
-  if grep -qi microsoft /proc/version 2>/dev/null; then
-    log "WSL detected: chsh may not affect Windows Terminal profiles."
-  fi
-
   log "Changing default shell to zsh..."
   if chsh -s "$(command -v zsh)"; then
     log "Default shell changed to zsh. Log out/in to apply."
@@ -218,7 +213,7 @@ backup_conflicts_for_pkg() {
   stow -n -v -t "$TARGET" "$pkg" 2>&1 | awk '
     $1 ~ /^(LINK:|RELINK:)/ { print $2 }
   ' | while IFS= read -r target; do
-    backup_if_real_not_symlink "$target"
+    backup_if_real_not_symlink "$TARGET/$target"
   done
 }
 
@@ -251,17 +246,5 @@ case "$MODE" in
 esac
 
 if (( DRY_RUN == 0 )) && [ "$MODE" != "unstow" ]; then
-  log ""
-  log "Verify symlinks (examples):"
-  for f in "$HOME/.zshrc" \
-        "$HOME/.tmux.conf" \
-        "$HOME/.gitconfig" \
-        "$HOME/.config/nvim" \
-        "$HOME/.config/kitty"
-    do
-    [ -e "$f" ] && ls -l "$f" || true
-  done
-  log ""
   log "Done."
-  log "Tip: run 'zsh' to test immediately.$([ "$DO_CHSH" -eq 1 ] && printf " (Default will apply next login.)")"
 fi
