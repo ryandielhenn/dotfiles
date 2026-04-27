@@ -1,15 +1,17 @@
 vim.g.editorconfig = false
-vim.g.clipboard = {
-  name  = "osc52",
-  copy  = {
-    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-    ["*"] = require("vim.ui.clipboard.osc52").copy("*")
-  },
-  paste = {
-    ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-    ["*"] = require("vim.ui.clipboard.osc52").paste("+")
-  },
-}
+if vim.env.SSH_TTY ~= nil or vim.env.SSH_CLIENT ~= nil then
+  vim.g.clipboard = {
+    name  = "osc52",
+    copy  = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*")
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("+")
+    },
+  }
+end
 vim.o.clipboard = "unnamedplus"
 
 local o, wo = vim.o, vim.wo
