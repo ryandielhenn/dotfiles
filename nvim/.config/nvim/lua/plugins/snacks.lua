@@ -22,5 +22,16 @@ return {
       end,
       desc = "Find Config File",
     },
+    {
+      "<leader>ed",
+      function()
+        Snacks.picker.files({
+          cwd = vim.fn.expand("~/.dotfiles"),
+          hidden = true,
+          exclude = { "nvim" },
+        })
+      end,
+      desc = "Find Dotfiles",
+    },
   },
 }
