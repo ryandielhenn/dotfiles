@@ -31,6 +31,9 @@ o.report = 0                     -- always report number of lines changed (defau
 vim.g.netrw_browse_split = 0     -- open files in same window
 vim.g.netrw_winsize = 25         -- explorer takes 25% of width
 
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+
 -- Keymap helper
 local map = function(m, l, r, o)
   o = vim.tbl_extend("force", { silent = true, noremap = true }, o or {})
@@ -38,19 +41,40 @@ local map = function(m, l, r, o)
 end
 
 -- Leader Keymappings
-map("n", "<leader>ff", ":Files<CR>")      -- fuzzy file find
-map("n", "<leader>ll", ":Lazy<CR>")       -- replace all
-map("n", "<leader>ma", ":Mason<CR>")      -- replace all
-map("n", "<leader>fb", ":Buffers<CR>")    --
-map("n", "<leader>fe", ":Lexplore<CR>")   -- file explorer
-map("n", "<leader>gd", ":Gdiffsplit<CR>") -- file explorer
-map("n", "<leader>ra", ":%s/")            -- replace all
+map("n", "<leader>ll", ":Lazy<CR>") -- open Lazy plugin manager
+map("n", "<leader>ra", ":%s/")      -- replace all
 
--- non-Leader Keymappings
-map("n", "gf", ":GFiles<CR>")    -- fuzzy find files tracked by git
-map("n", "gb", ":Git blame<CR>") -- git blame
-map("n", "bn", ":bn<CR>")        -- next buffer
-map("n", "bp", ":bp<CR>")        -- previous buffer
+-- buffer navigation
+map("n", "bn", ":bn<CR>") -- next buffer
+map("n", "bp", ":bp<CR>") -- previous buffer
+
+-- terminal keymappings
+map("t", "<esc><esc>", "<C-\\><C-n>")
+map("n", "<leader>th", ":term<CR>")
+map("n", "<leader>tv", ":vert term<CR>")
+
+-- sync cwd with buffer
+local function get_cwd_from_pid(pid)
+  if vim.fn.has('mac') == 1 then
+    local out = vim.fn.system({ 'lsof', '-a', '-p', tostring(pid), '-d', 'cwd', '-Fn' })
+    if vim.v.shell_error ~= 0 then return nil end
+    return out:match('\nn(/[^\n]*)')
+  else
+    return vim.fn.resolve('/proc/' .. pid .. '/cwd')
+  end
+end
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'TermEnter', 'TermLeave' }, {
+  desc = 'cd to terminal cwd on enter',
+  pattern = 'term://*',
+  callback = function()
+    local pid = vim.b.terminal_job_pid
+    if not pid then return end
+    local cwd = get_cwd_from_pid(pid)
+    if not cwd or vim.fn.isdirectory(cwd) == 0 then return end
+    vim.fn.chdir(cwd)
+  end,
+})
 
 -- Colorscheme
 vim.o.termguicolors = true
@@ -67,7 +91,6 @@ end)
 -- MarkdownPreview
 vim.g.mkdp_filetypes = { "markdown" }
 vim.g.mkdp_auto_close = 1
-map("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
 
 -- Conform plugin settings for code formatting
 require("conform").setup({
