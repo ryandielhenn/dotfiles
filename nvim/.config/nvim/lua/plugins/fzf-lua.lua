@@ -21,7 +21,6 @@ return {
         silent = true,
         desc = "Telescope buffers"
       },
-
       {
         "<leader>ff",
         ":FzfLua files<CR>",
@@ -42,13 +41,15 @@ return {
       },
       {
         "<leader>gw",
-        function() require("fzf-lua").grep_cword() end,
+        ":FzfLua grep_cword<CR>",
+        silent = true,
         desc = "Grep word under cursor",
         mode = "n",
       },
       {
         "<leader>gw",
-        function() require("fzf-lua").grep_visual() end,
+        ":<C-u>FzfLua grep_visual<CR>",
+        silent = true,
         desc = "Grep visual selection",
         mode = "x",
       },
