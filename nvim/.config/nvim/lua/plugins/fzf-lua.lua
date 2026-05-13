@@ -1,3 +1,7 @@
+vim.api.nvim_create_user_command('Rg', function(opts)
+  require('fzf-lua').grep({ search = opts.args })
+end, { nargs = "*" })
+
 return {
   {
     "ibhagwan/fzf-lua",
@@ -11,6 +15,10 @@ return {
     opts = {
       winopts = {
         split = "botright " .. math.floor(vim.o.lines * 0.4) .. "new",
+        preview = {
+          layout = "horizontal",
+          horizontal = "right:50%",
+        },
       },
     },
     ---@diagnostic enable: missing-fields
