@@ -73,8 +73,7 @@ return {
         function()
           require("fzf-lua").files({
             cwd = vim.fn.expand("~/.dotfiles"),
-            hidden = true,
-            fd_opts = "--color=never --type f --hidden --follow --exclude .git --exclude nvim",
+            cmd = "find . \\( -name '.git' -o -name 'nvim' \\) -prune -o -type f -print",
           })
         end,
         desc = "Find Dotfiles",
