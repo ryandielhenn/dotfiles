@@ -68,6 +68,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'TermEnter', 'TermLeave' }, {
   desc = 'cd to terminal cwd on enter',
   pattern = 'term://*',
   callback = function()
+    if vim.bo.filetype == 'fzf' then return end
     local pid = vim.b.terminal_job_pid
     if not pid then return end
     local cwd = get_cwd_from_pid(pid)
