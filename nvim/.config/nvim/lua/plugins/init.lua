@@ -21,7 +21,6 @@ return {
   { "stevearc/conform.nvim" },
   { "williamboman/mason-lspconfig.nvim" },
   { "mfussenegger/nvim-jdtls",          ft = { "java" } },
-  { 'wakatime/vim-wakatime',            lazy = false, },
   { "edkolev/tmuxline.vim" },
   {
     "tpope/vim-fugitive",
