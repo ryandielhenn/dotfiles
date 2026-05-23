@@ -34,10 +34,6 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell" # set by `omz`
 plugins=(git)
 
-if grep -qi microsoft /proc/version 2>/dev/null; then
-  [[ -f "$HOME/.zshrc-wsl" ]] && source "$HOME/.zshrc-wsl"
-fi
-
 source "$ZSH/oh-my-zsh.sh"
 
 export NVM_DIR="$HOME/.nvm"
@@ -67,9 +63,6 @@ fi
 # ---------- end Go toolchain ----------
 
 [ -d "$HOME/.local/bin" ] && export PATH="$PATH:$HOME/.local/bin"
-
-# opencode
-export PATH=$HOME/.opencode/bin:$PATH
 
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"

@@ -209,12 +209,28 @@ backup_conflicts_for_pkg() {
   # Ensure parent ~/.config exists (safe no-op if already there)
   mkdir -p "$HOME/.config"
 
-  # Ask stow what it would link; free those targets if they’re not symlinks
-  stow -n -v -t "$TARGET" "$pkg" 2>&1 | awk '
-    $1 ~ /^(LINK:|RELINK:)/ { print $2 }
-  ' | while IFS= read -r target; do
-    backup_if_real_not_symlink "$TARGET/$target"
-  done
+  local tmpfile target line
+  tmpfile=$(mktemp)
+  stow -n -v -t "$TARGET" "$pkg" >"$tmpfile" 2>&1 || true
+
+  while IFS= read -r line; do
+    target=""
+    case "$line" in
+      LINK:*|RELINK:*)
+        target="${line#*: }"
+        target="${target%% *}"
+        ;;
+      *"existing target "*)
+        target="${line##*existing target }"
+        target="${target%% since*}"
+        ;;
+    esac
+    if [ -n "$target" ]; then
+      backup_if_real_not_symlink "$TARGET/$target"
+    fi
+  done < "$tmpfile"
+
+  rm -f "$tmpfile"
 }
 
 # --------------------------------------------
