@@ -10,6 +10,7 @@ vim.lsp.config("rust_analyzer", {
         allFeatures = true,
         loadOutDirsFromCheck = true,
         runBuildScripts = true,
+        cfgs = { "debug_assertions", "miri", "dst", "tokio_unstable" },
       },
     }
   }
