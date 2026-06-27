@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
-capacity=$(cat /sys/class/power_supply/BAT0/capacity)
-stat=$(cat /sys/class/power_supply/BAT0/status)
+readonly battery=/sys/class/power_supply/BAT0
+read -r capacity < "$battery/capacity"
+read -r status < "$battery/status"
 
-if ["$stat" = "Charging"]; then
-  echo "󱐋 $capacity%"
+if [[ $status == Charging ]]; then
+  icon='󱐋'
 else
-  echo "󰁿 $capacity%"
+  icons=(󰂎 󰁺 󰁻 󰁼 󰁽 󰁾 󰁿 󰂀 󰂁 󰂂 󰁹)
+  icon=${icons[capacity / 10]}
 fi
+
+printf '%s %s%%\n' "$icon" "$capacity"
