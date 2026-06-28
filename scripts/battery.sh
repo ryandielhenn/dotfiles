@@ -2,7 +2,7 @@
 
 readonly battery=/sys/class/power_supply/BAT0
 
-if [ -f "$battery" ]; then
+if [ -d "$battery" ]; then
   read -r capacity < "$battery/capacity"
   read -r status < "$battery/status"
 
