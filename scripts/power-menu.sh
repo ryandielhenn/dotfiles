@@ -2,7 +2,7 @@
 
 options="Lock\nReboot\nShutdown"
 
-chosen=$(printf "$options" | dmenu -p "Power:" \
+chosen=$(printf "$options" | dmenu -i -c -a 75 -l 3 \
     -nb "#2b3339" -nf "#d3c6aa" \
     -sb "#a7c080" -sf "#2b3339" \
     -fn "monospace:size=10")
