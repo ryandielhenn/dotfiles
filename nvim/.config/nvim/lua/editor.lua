@@ -33,7 +33,6 @@ vim.g.netrw_winsize = 25 -- explorer takes 25% of width
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
-
 -- Keymap helper
 local map = function(m, l, r, o)
 	o = vim.tbl_extend("force", { silent = true, noremap = true }, o or {})
