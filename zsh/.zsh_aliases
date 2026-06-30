@@ -1,5 +1,5 @@
 # neovim > vim
-alias vim="kitten @ set-background-opacity 1 && nvim; kitten @ set-background-opacity 0.75"
+alias vim="nvim"
 
 if command -v xdg-open &> /dev/null; then
     open() {
